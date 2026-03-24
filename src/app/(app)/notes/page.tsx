@@ -63,7 +63,7 @@ export default function NotesPage() {
       {/* Mobile FAB */}
       <button
         onClick={() => setShowNew(true)}
-        className="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-500 shadow-lg shadow-indigo-500/30 transition hover:bg-indigo-400 active:scale-95 lg:hidden"
+        className="fixed bottom-24 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-500 shadow-lg shadow-indigo-500/30 transition hover:bg-indigo-400 active:scale-95 lg:hidden"
       >
         <Plus size={24} className="text-white" strokeWidth={2.5} />
       </button>

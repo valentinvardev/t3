@@ -158,7 +158,15 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   emailVerified: 'emailVerified',
   image: 'image',
-  password: 'password'
+  password: 'password',
+  lastSeen: 'lastSeen'
+};
+
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  content: 'content',
+  createdAt: 'createdAt',
+  userId: 'userId'
 };
 
 exports.Prisma.NoteScalarFieldEnum = {
@@ -205,6 +213,7 @@ exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   User: 'User',
+  Message: 'Message',
   Note: 'Note',
   ChecklistItem: 'ChecklistItem',
   VerificationToken: 'VerificationToken'

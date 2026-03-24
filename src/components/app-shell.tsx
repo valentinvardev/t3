@@ -1,11 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, Zap } from "lucide-react";
 import Sidebar from "~/components/sidebar";
+import ChatBar from "~/components/chat-bar";
+import { api } from "~/trpc/react";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const heartbeat = api.users.heartbeat.useMutation();
+
+  useEffect(() => {
+    heartbeat.mutate();
+    const id = setInterval(() => heartbeat.mutate(), 30_000);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -46,6 +56,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <main className="flex-1 overflow-y-auto bg-zinc-950">{children}</main>
       </div>
+
+      <ChatBar />
     </div>
   );
 }

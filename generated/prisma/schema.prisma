@@ -59,11 +59,24 @@ model User {
   emailVerified  DateTime?
   image          String?
   password       String?
+  lastSeen       DateTime?
   accounts       Account[]
   sessions       Session[]
   posts          Post[]
   notes          Note[]
   checklistItems ChecklistItem[]
+  messages       Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([createdAt])
 }
 
 model Note {
