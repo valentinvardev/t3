@@ -71,23 +71,32 @@ export default function NotesPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-8 py-5">
+      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-5 py-4 lg:px-8 lg:py-5">
         <div>
           <h1 className="text-xl font-semibold text-zinc-100">Notes</h1>
           <p className="text-sm text-zinc-500">{notes.length} note{notes.length !== 1 ? "s" : ""}</p>
         </div>
+        {/* Desktop button only */}
         <button
           onClick={() => setShowNew(true)}
-          className="flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-400 active:scale-95"
+          className="hidden items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-400 active:scale-95 lg:flex"
         >
           <Plus size={16} strokeWidth={2.5} />
           New Note
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-8">
+      {/* Mobile FAB */}
+      <button
+        onClick={() => setShowNew(true)}
+        className="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-500 shadow-lg shadow-indigo-500/30 transition hover:bg-indigo-400 active:scale-95 lg:hidden"
+      >
+        <Plus size={24} className="text-white" strokeWidth={2.5} />
+      </button>
+
+      <div className="flex-1 overflow-y-auto p-5 lg:p-8">
         {/* Search */}
-        <div className="relative mb-6 max-w-sm">
+        <div className="relative mb-6 w-full max-w-sm">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"

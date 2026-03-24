@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CheckSquare, FileText, Zap, LogOut } from "lucide-react";
+import { CheckSquare, FileText, Zap, LogOut, X } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const navItems = [
@@ -10,19 +10,28 @@ const navItems = [
   { href: "/checklist", label: "Checklist", icon: CheckSquare },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900 text-zinc-400">
+    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900 text-zinc-400 lg:w-60">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 border-b border-zinc-800 px-5 py-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500">
-          <Zap size={14} className="text-white" strokeWidth={2.5} />
+      <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-5">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500">
+            <Zap size={14} className="text-white" strokeWidth={2.5} />
+          </div>
+          <span className="text-sm font-semibold tracking-tight text-white">Noted</span>
         </div>
-        <span className="text-sm font-semibold tracking-tight text-white">
-          Noted
-        </span>
+        {/* Close button — mobile only */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="rounded-md p-1 text-zinc-500 transition hover:bg-zinc-800 hover:text-zinc-200 lg:hidden"
+          >
+            <X size={18} />
+          </button>
+        )}
       </div>
 
       {/* Nav */}
@@ -36,7 +45,8 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium transition-colors ${
+              onClick={onClose}
+              className={`flex items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors lg:py-2 ${
                 active
                   ? "bg-indigo-500/15 text-indigo-400"
                   : "hover:bg-zinc-800 hover:text-zinc-200"
@@ -53,7 +63,7 @@ export default function Sidebar() {
       <div className="border-t border-zinc-800 p-3">
         <button
           onClick={() => signOut({ callbackUrl: "/signin" })}
-          className="flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium text-zinc-500 transition hover:bg-zinc-800 hover:text-red-400"
+          className="flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-sm font-medium text-zinc-500 transition hover:bg-zinc-800 hover:text-red-400 lg:py-2"
         >
           <LogOut size={16} />
           Sign out
