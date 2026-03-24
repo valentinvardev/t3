@@ -6159,6 +6159,8 @@ export namespace Prisma {
   export type MessageMinAggregateOutputType = {
     id: string | null
     content: string | null
+    sharedNoteTitle: string | null
+    sharedNoteContent: string | null
     createdAt: Date | null
     userId: string | null
   }
@@ -6166,6 +6168,8 @@ export namespace Prisma {
   export type MessageMaxAggregateOutputType = {
     id: string | null
     content: string | null
+    sharedNoteTitle: string | null
+    sharedNoteContent: string | null
     createdAt: Date | null
     userId: string | null
   }
@@ -6173,6 +6177,8 @@ export namespace Prisma {
   export type MessageCountAggregateOutputType = {
     id: number
     content: number
+    sharedNoteTitle: number
+    sharedNoteContent: number
     createdAt: number
     userId: number
     _all: number
@@ -6182,6 +6188,8 @@ export namespace Prisma {
   export type MessageMinAggregateInputType = {
     id?: true
     content?: true
+    sharedNoteTitle?: true
+    sharedNoteContent?: true
     createdAt?: true
     userId?: true
   }
@@ -6189,6 +6197,8 @@ export namespace Prisma {
   export type MessageMaxAggregateInputType = {
     id?: true
     content?: true
+    sharedNoteTitle?: true
+    sharedNoteContent?: true
     createdAt?: true
     userId?: true
   }
@@ -6196,6 +6206,8 @@ export namespace Prisma {
   export type MessageCountAggregateInputType = {
     id?: true
     content?: true
+    sharedNoteTitle?: true
+    sharedNoteContent?: true
     createdAt?: true
     userId?: true
     _all?: true
@@ -6276,6 +6288,8 @@ export namespace Prisma {
   export type MessageGroupByOutputType = {
     id: string
     content: string
+    sharedNoteTitle: string | null
+    sharedNoteContent: string | null
     createdAt: Date
     userId: string
     _count: MessageCountAggregateOutputType | null
@@ -6300,6 +6314,8 @@ export namespace Prisma {
   export type MessageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     content?: boolean
+    sharedNoteTitle?: boolean
+    sharedNoteContent?: boolean
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -6308,6 +6324,8 @@ export namespace Prisma {
   export type MessageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     content?: boolean
+    sharedNoteTitle?: boolean
+    sharedNoteContent?: boolean
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -6316,6 +6334,8 @@ export namespace Prisma {
   export type MessageSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     content?: boolean
+    sharedNoteTitle?: boolean
+    sharedNoteContent?: boolean
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -6324,11 +6344,13 @@ export namespace Prisma {
   export type MessageSelectScalar = {
     id?: boolean
     content?: boolean
+    sharedNoteTitle?: boolean
+    sharedNoteContent?: boolean
     createdAt?: boolean
     userId?: boolean
   }
 
-  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "content" | "createdAt" | "userId", ExtArgs["result"]["message"]>
+  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "content" | "sharedNoteTitle" | "sharedNoteContent" | "createdAt" | "userId", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -6347,6 +6369,8 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       content: string
+      sharedNoteTitle: string | null
+      sharedNoteContent: string | null
       createdAt: Date
       userId: string
     }, ExtArgs["result"]["message"]>
@@ -6775,6 +6799,8 @@ export namespace Prisma {
   interface MessageFieldRefs {
     readonly id: FieldRef<"Message", 'String'>
     readonly content: FieldRef<"Message", 'String'>
+    readonly sharedNoteTitle: FieldRef<"Message", 'String'>
+    readonly sharedNoteContent: FieldRef<"Message", 'String'>
     readonly createdAt: FieldRef<"Message", 'DateTime'>
     readonly userId: FieldRef<"Message", 'String'>
   }
@@ -10359,6 +10385,8 @@ export namespace Prisma {
   export const MessageScalarFieldEnum: {
     id: 'id',
     content: 'content',
+    sharedNoteTitle: 'sharedNoteTitle',
+    sharedNoteContent: 'sharedNoteContent',
     createdAt: 'createdAt',
     userId: 'userId'
   };
@@ -10784,6 +10812,8 @@ export namespace Prisma {
     NOT?: MessageWhereInput | MessageWhereInput[]
     id?: StringFilter<"Message"> | string
     content?: StringFilter<"Message"> | string
+    sharedNoteTitle?: StringNullableFilter<"Message"> | string | null
+    sharedNoteContent?: StringNullableFilter<"Message"> | string | null
     createdAt?: DateTimeFilter<"Message"> | Date | string
     userId?: StringFilter<"Message"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -10792,6 +10822,8 @@ export namespace Prisma {
   export type MessageOrderByWithRelationInput = {
     id?: SortOrder
     content?: SortOrder
+    sharedNoteTitle?: SortOrderInput | SortOrder
+    sharedNoteContent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -10803,6 +10835,8 @@ export namespace Prisma {
     OR?: MessageWhereInput[]
     NOT?: MessageWhereInput | MessageWhereInput[]
     content?: StringFilter<"Message"> | string
+    sharedNoteTitle?: StringNullableFilter<"Message"> | string | null
+    sharedNoteContent?: StringNullableFilter<"Message"> | string | null
     createdAt?: DateTimeFilter<"Message"> | Date | string
     userId?: StringFilter<"Message"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -10811,6 +10845,8 @@ export namespace Prisma {
   export type MessageOrderByWithAggregationInput = {
     id?: SortOrder
     content?: SortOrder
+    sharedNoteTitle?: SortOrderInput | SortOrder
+    sharedNoteContent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
     _count?: MessageCountOrderByAggregateInput
@@ -10824,6 +10860,8 @@ export namespace Prisma {
     NOT?: MessageScalarWhereWithAggregatesInput | MessageScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Message"> | string
     content?: StringWithAggregatesFilter<"Message"> | string
+    sharedNoteTitle?: StringNullableWithAggregatesFilter<"Message"> | string | null
+    sharedNoteContent?: StringNullableWithAggregatesFilter<"Message"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
     userId?: StringWithAggregatesFilter<"Message"> | string
   }
@@ -11293,14 +11331,18 @@ export namespace Prisma {
 
   export type MessageCreateInput = {
     id?: string
-    content: string
+    content?: string
+    sharedNoteTitle?: string | null
+    sharedNoteContent?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutMessagesInput
   }
 
   export type MessageUncheckedCreateInput = {
     id?: string
-    content: string
+    content?: string
+    sharedNoteTitle?: string | null
+    sharedNoteContent?: string | null
     createdAt?: Date | string
     userId: string
   }
@@ -11308,6 +11350,8 @@ export namespace Prisma {
   export type MessageUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutMessagesNestedInput
   }
@@ -11315,13 +11359,17 @@ export namespace Prisma {
   export type MessageUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
   }
 
   export type MessageCreateManyInput = {
     id?: string
-    content: string
+    content?: string
+    sharedNoteTitle?: string | null
+    sharedNoteContent?: string | null
     createdAt?: Date | string
     userId: string
   }
@@ -11329,12 +11377,16 @@ export namespace Prisma {
   export type MessageUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MessageUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
   }
@@ -11887,6 +11939,8 @@ export namespace Prisma {
   export type MessageCountOrderByAggregateInput = {
     id?: SortOrder
     content?: SortOrder
+    sharedNoteTitle?: SortOrder
+    sharedNoteContent?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
   }
@@ -11894,6 +11948,8 @@ export namespace Prisma {
   export type MessageMaxOrderByAggregateInput = {
     id?: SortOrder
     content?: SortOrder
+    sharedNoteTitle?: SortOrder
+    sharedNoteContent?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
   }
@@ -11901,6 +11957,8 @@ export namespace Prisma {
   export type MessageMinOrderByAggregateInput = {
     id?: SortOrder
     content?: SortOrder
+    sharedNoteTitle?: SortOrder
+    sharedNoteContent?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
   }
@@ -12930,13 +12988,17 @@ export namespace Prisma {
 
   export type MessageCreateWithoutUserInput = {
     id?: string
-    content: string
+    content?: string
+    sharedNoteTitle?: string | null
+    sharedNoteContent?: string | null
     createdAt?: Date | string
   }
 
   export type MessageUncheckedCreateWithoutUserInput = {
     id?: string
-    content: string
+    content?: string
+    sharedNoteTitle?: string | null
+    sharedNoteContent?: string | null
     createdAt?: Date | string
   }
 
@@ -13115,6 +13177,8 @@ export namespace Prisma {
     NOT?: MessageScalarWhereInput | MessageScalarWhereInput[]
     id?: StringFilter<"Message"> | string
     content?: StringFilter<"Message"> | string
+    sharedNoteTitle?: StringNullableFilter<"Message"> | string | null
+    sharedNoteContent?: StringNullableFilter<"Message"> | string | null
     createdAt?: DateTimeFilter<"Message"> | Date | string
     userId?: StringFilter<"Message"> | string
   }
@@ -13392,7 +13456,9 @@ export namespace Prisma {
 
   export type MessageCreateManyUserInput = {
     id?: string
-    content: string
+    content?: string
+    sharedNoteTitle?: string | null
+    sharedNoteContent?: string | null
     createdAt?: Date | string
   }
 
@@ -13527,18 +13593,24 @@ export namespace Prisma {
   export type MessageUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MessageUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MessageUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

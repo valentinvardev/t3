@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, FileText, Trash2, Loader2 } from "lucide-react";
+import { Plus, Search, FileText, Trash2, Loader2, Share2, Check } from "lucide-react";
 import { api } from "~/trpc/react";
 
 function formatDate(date: Date) {
@@ -29,6 +29,23 @@ export default function NotesPage() {
   const remove = api.notes.delete.useMutation({
     onSuccess: () => utils.notes.getAll.invalidate(),
   });
+
+  const [justShared, setJustShared] = useState<string | null>(null);
+
+  const shareToChat = api.messages.send.useMutation({
+    onSuccess: (_data, vars) => {
+      setJustShared(vars.sharedNoteTitle ?? null);
+      setTimeout(() => setJustShared(null), 2000);
+    },
+  });
+
+  function shareNote(note: { title: string; content: string }) {
+    shareToChat.mutate({
+      content: "",
+      sharedNoteTitle: note.title,
+      sharedNoteContent: note.content,
+    });
+  }
 
   const filtered = notes.filter(
     (n) =>
@@ -142,26 +159,50 @@ export default function NotesPage() {
         {/* Notes grid */}
         {!isLoading && filtered.length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((note) => (
-              <div
-                key={note.id}
-                className="group relative rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition hover:border-zinc-700"
-              >
-                <button
-                  onClick={() => remove.mutate({ id: note.id })}
-                  className="absolute right-3 top-3 hidden rounded-md p-1.5 text-zinc-600 transition hover:bg-red-500/10 hover:text-red-400 group-hover:flex"
+            {filtered.map((note) => {
+              const shared = justShared === note.title;
+              return (
+                <div
+                  key={note.id}
+                  className={`group relative rounded-xl border bg-zinc-900 p-5 shadow-sm transition ${
+                    shared
+                      ? "border-indigo-500/50 ring-1 ring-indigo-500/20"
+                      : "border-zinc-800 hover:border-zinc-700"
+                  }`}
                 >
-                  <Trash2 size={14} />
-                </button>
-                <h3 className="mb-1.5 pr-6 text-sm font-semibold text-zinc-100 line-clamp-1">
-                  {note.title}
-                </h3>
-                <p className="mb-4 text-sm leading-relaxed text-zinc-500 line-clamp-3">
-                  {note.content || <span className="italic text-zinc-600">Empty note</span>}
-                </p>
-                <p className="text-xs text-zinc-600">{formatDate(note.updatedAt)}</p>
-              </div>
-            ))}
+                  {/* Action buttons — visible on hover */}
+                  <div className="absolute right-3 top-3 hidden items-center gap-1 group-hover:flex">
+                    <button
+                      onClick={() => shareNote(note)}
+                      disabled={shareToChat.isPending}
+                      title="Share to chat"
+                      className="rounded-md p-1.5 text-zinc-600 transition hover:bg-indigo-500/10 hover:text-indigo-400"
+                    >
+                      {shared ? <Check size={14} className="text-indigo-400" /> : <Share2 size={14} />}
+                    </button>
+                    <button
+                      onClick={() => remove.mutate({ id: note.id })}
+                      className="rounded-md p-1.5 text-zinc-600 transition hover:bg-red-500/10 hover:text-red-400"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+
+                  <h3 className="mb-1.5 pr-14 text-sm font-semibold text-zinc-100 line-clamp-1">
+                    {note.title}
+                  </h3>
+                  <p className="mb-4 text-sm leading-relaxed text-zinc-500 line-clamp-3">
+                    {note.content || <span className="italic text-zinc-600">Empty note</span>}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-zinc-600">{formatDate(note.updatedAt)}</p>
+                    {shared && (
+                      <span className="text-xs font-medium text-indigo-400">Shared to chat</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

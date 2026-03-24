@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Users, ArrowLeft, Send, Loader2 } from "lucide-react";
+import { MessageCircle, X, Users, ArrowLeft, Send, Loader2, FileText } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { api, type RouterOutputs } from "~/trpc/react";
 
@@ -171,6 +171,7 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
           <div className="flex flex-col gap-3">
             {messages.map((msg) => {
               const isMe = msg.user.id === session?.user?.id;
+              const isNote = !!msg.sharedNoteTitle;
               return (
                 <div key={msg.id} className={`flex gap-2.5 ${isMe ? "flex-row-reverse" : ""}`}>
                   {!isMe && (
@@ -180,21 +181,58 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
                       {avatar(msg.user.name)}
                     </div>
                   )}
-                  <div className={`flex max-w-[75%] flex-col gap-0.5 ${isMe ? "items-end" : ""}`}>
+                  <div className={`flex max-w-[80%] flex-col gap-0.5 ${isMe ? "items-end" : ""}`}>
                     {!isMe && (
                       <span className="text-xs font-medium text-zinc-500">
                         {msg.user.name ?? "Unknown"}
                       </span>
                     )}
-                    <div
-                      className={`rounded-2xl px-3 py-2 text-sm leading-snug ${
+
+                    {isNote ? (
+                      /* ── Shared note card ── */
+                      <div className={`w-full overflow-hidden rounded-2xl border bg-zinc-800/60 ${
                         isMe
-                          ? "rounded-tr-sm bg-indigo-500 text-white"
-                          : "rounded-tl-sm bg-zinc-800 text-zinc-200"
-                      }`}
-                    >
-                      {msg.content}
-                    </div>
+                          ? "rounded-tr-sm border-indigo-500/40"
+                          : "rounded-tl-sm border-zinc-700"
+                      }`}>
+                        {/* Label */}
+                        <div className={`flex items-center gap-1.5 border-b px-3 py-2 ${
+                          isMe ? "border-indigo-500/20 bg-indigo-500/10" : "border-zinc-700 bg-zinc-800"
+                        }`}>
+                          <FileText size={11} className={isMe ? "text-indigo-300" : "text-zinc-400"} />
+                          <span className={`text-[10px] font-semibold uppercase tracking-wider ${
+                            isMe ? "text-indigo-300" : "text-zinc-400"
+                          }`}>
+                            Shared note
+                          </span>
+                        </div>
+                        {/* Content */}
+                        <div className="px-3 py-2.5">
+                          <p className="mb-1 text-sm font-semibold text-zinc-100 line-clamp-1">
+                            {msg.sharedNoteTitle}
+                          </p>
+                          {msg.sharedNoteContent ? (
+                            <p className="text-xs leading-relaxed text-zinc-400 line-clamp-3">
+                              {msg.sharedNoteContent}
+                            </p>
+                          ) : (
+                            <p className="text-xs italic text-zinc-600">Empty note</p>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      /* ── Regular message ── */
+                      <div
+                        className={`rounded-2xl px-3 py-2 text-sm leading-snug ${
+                          isMe
+                            ? "rounded-tr-sm bg-indigo-500 text-white"
+                            : "rounded-tl-sm bg-zinc-800 text-zinc-200"
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
+                    )}
+
                     <span className="text-[10px] text-zinc-700">{formatTime(msg.createdAt)}</span>
                   </div>
                 </div>

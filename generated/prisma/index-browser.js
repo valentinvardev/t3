@@ -165,6 +165,8 @@ exports.Prisma.UserScalarFieldEnum = {
 exports.Prisma.MessageScalarFieldEnum = {
   id: 'id',
   content: 'content',
+  sharedNoteTitle: 'sharedNoteTitle',
+  sharedNoteContent: 'sharedNoteContent',
   createdAt: 'createdAt',
   userId: 'userId'
 };
