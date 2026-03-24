@@ -159,7 +159,8 @@ exports.Prisma.UserScalarFieldEnum = {
   emailVerified: 'emailVerified',
   image: 'image',
   password: 'password',
-  lastSeen: 'lastSeen'
+  lastSeen: 'lastSeen',
+  points: 'points'
 };
 
 exports.Prisma.MessageScalarFieldEnum = {
@@ -167,8 +168,19 @@ exports.Prisma.MessageScalarFieldEnum = {
   content: 'content',
   sharedNoteTitle: 'sharedNoteTitle',
   sharedNoteContent: 'sharedNoteContent',
+  coinflipGameId: 'coinflipGameId',
   createdAt: 'createdAt',
   userId: 'userId'
+};
+
+exports.Prisma.CoinflipGameScalarFieldEnum = {
+  id: 'id',
+  bet: 'bet',
+  status: 'status',
+  winnerId: 'winnerId',
+  createdAt: 'createdAt',
+  creatorId: 'creatorId',
+  joinerId: 'joinerId'
 };
 
 exports.Prisma.NoteScalarFieldEnum = {
@@ -208,7 +220,11 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.CoinflipStatus = exports.$Enums.CoinflipStatus = {
+  WAITING: 'WAITING',
+  FINISHED: 'FINISHED',
+  CANCELLED: 'CANCELLED'
+};
 
 exports.Prisma.ModelName = {
   Post: 'Post',
@@ -216,6 +232,7 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   User: 'User',
   Message: 'Message',
+  CoinflipGame: 'CoinflipGame',
   Note: 'Note',
   ChecklistItem: 'ChecklistItem',
   VerificationToken: 'VerificationToken'

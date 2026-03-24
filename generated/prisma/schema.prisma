@@ -54,19 +54,22 @@ model Session {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  name           String?
-  email          String?         @unique
-  emailVerified  DateTime?
-  image          String?
-  password       String?
-  lastSeen       DateTime?
-  accounts       Account[]
-  sessions       Session[]
-  posts          Post[]
-  notes          Note[]
-  checklistItems ChecklistItem[]
-  messages       Message[]
+  id               String          @id @default(cuid())
+  name             String?
+  email            String?         @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  lastSeen         DateTime?
+  points           Int             @default(1000)
+  accounts         Account[]
+  sessions         Session[]
+  posts            Post[]
+  notes            Note[]
+  checklistItems   ChecklistItem[]
+  messages         Message[]
+  coinflipsCreated CoinflipGame[]  @relation("CoinflipCreator")
+  coinflipsJoined  CoinflipGame[]  @relation("CoinflipJoiner")
 }
 
 model Message {
@@ -74,12 +77,36 @@ model Message {
   content           String   @default("")
   sharedNoteTitle   String?
   sharedNoteContent String?
+  coinflipGameId    String?  @unique
   createdAt         DateTime @default(now())
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  coinflipGame CoinflipGame? @relation(fields: [coinflipGameId], references: [id])
 
   @@index([createdAt])
+}
+
+enum CoinflipStatus {
+  WAITING
+  FINISHED
+  CANCELLED
+}
+
+model CoinflipGame {
+  id        String         @id @default(cuid())
+  bet       Int
+  status    CoinflipStatus @default(WAITING)
+  winnerId  String?
+  createdAt DateTime       @default(now())
+
+  creatorId String
+  creator   User   @relation("CoinflipCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  joinerId String?
+  joiner   User?   @relation("CoinflipJoiner", fields: [joinerId], references: [id])
+
+  message Message?
 }
 
 model Note {

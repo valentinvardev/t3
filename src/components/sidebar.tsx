@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CheckSquare, FileText, Zap, LogOut, X } from "lucide-react";
+import { CheckSquare, FileText, Zap, LogOut, X, Coins } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { api } from "~/trpc/react";
 
 const navItems = [
   { href: "/notes", label: "Notes", icon: FileText },
@@ -24,6 +25,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user;
+  const { data: me } = api.users.me.useQuery(undefined, { refetchInterval: 10_000 });
 
   return (
     <aside className="flex h-full w-64 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900 text-zinc-400 lg:w-60">
@@ -85,6 +87,12 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
               <p className="truncate text-xs font-semibold text-zinc-200">{user.name ?? "User"}</p>
               <p className="truncate text-[10px] text-zinc-600">{user.email}</p>
             </div>
+            {me && (
+              <div className="flex items-center gap-1 rounded-md bg-amber-500/10 px-1.5 py-0.5">
+                <Coins size={10} className="text-amber-400" />
+                <span className="text-[10px] font-bold text-amber-400">{me.points}</span>
+              </div>
+            )}
           </div>
         )}
         <button

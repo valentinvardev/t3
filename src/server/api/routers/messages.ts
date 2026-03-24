@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const messagesRouter = createTRPCRouter({
@@ -8,6 +9,12 @@ export const messagesRouter = createTRPCRouter({
       orderBy: { createdAt: "asc" },
       include: {
         user: { select: { id: true, name: true } },
+        coinflipGame: {
+          include: {
+            creator: { select: { id: true, name: true } },
+            joiner: { select: { id: true, name: true } },
+          },
+        },
       },
     }),
   ),
@@ -25,8 +32,24 @@ export const messagesRouter = createTRPCRouter({
           "Must have content or a shared note",
         ),
     )
-    .mutation(({ ctx, input }) =>
-      ctx.db.message.create({
+    .mutation(async ({ ctx, input }) => {
+      if (input.sharedNoteTitle) {
+        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+        const recentShare = await ctx.db.message.findFirst({
+          where: {
+            userId: ctx.session.user.id,
+            sharedNoteTitle: { not: null },
+            createdAt: { gte: twoMinutesAgo },
+          },
+        });
+        if (recentShare) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: "You can only share a note once every 2 minutes",
+          });
+        }
+      }
+      return ctx.db.message.create({
         data: {
           content: input.content,
           sharedNoteTitle: input.sharedNoteTitle,
@@ -34,6 +57,6 @@ export const messagesRouter = createTRPCRouter({
           userId: ctx.session.user.id,
         },
         include: { user: { select: { id: true, name: true } } },
-      }),
-    ),
+      });
+    }),
 });

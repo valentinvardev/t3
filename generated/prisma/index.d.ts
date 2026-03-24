@@ -39,6 +39,11 @@ export type User = $Result.DefaultSelection<Prisma.$UserPayload>
  */
 export type Message = $Result.DefaultSelection<Prisma.$MessagePayload>
 /**
+ * Model CoinflipGame
+ * 
+ */
+export type CoinflipGame = $Result.DefaultSelection<Prisma.$CoinflipGamePayload>
+/**
  * Model Note
  * 
  */
@@ -53,6 +58,24 @@ export type ChecklistItem = $Result.DefaultSelection<Prisma.$ChecklistItemPayloa
  * 
  */
 export type VerificationToken = $Result.DefaultSelection<Prisma.$VerificationTokenPayload>
+
+/**
+ * Enums
+ */
+export namespace $Enums {
+  export const CoinflipStatus: {
+  WAITING: 'WAITING',
+  FINISHED: 'FINISHED',
+  CANCELLED: 'CANCELLED'
+};
+
+export type CoinflipStatus = (typeof CoinflipStatus)[keyof typeof CoinflipStatus]
+
+}
+
+export type CoinflipStatus = $Enums.CoinflipStatus
+
+export const CoinflipStatus: typeof $Enums.CoinflipStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -221,6 +244,16 @@ export class PrismaClient<
     * ```
     */
   get message(): Prisma.MessageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.coinflipGame`: Exposes CRUD operations for the **CoinflipGame** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CoinflipGames
+    * const coinflipGames = await prisma.coinflipGame.findMany()
+    * ```
+    */
+  get coinflipGame(): Prisma.CoinflipGameDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.note`: Exposes CRUD operations for the **Note** model.
@@ -697,6 +730,7 @@ export namespace Prisma {
     Session: 'Session',
     User: 'User',
     Message: 'Message',
+    CoinflipGame: 'CoinflipGame',
     Note: 'Note',
     ChecklistItem: 'ChecklistItem',
     VerificationToken: 'VerificationToken'
@@ -718,7 +752,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "post" | "account" | "session" | "user" | "message" | "note" | "checklistItem" | "verificationToken"
+      modelProps: "post" | "account" | "session" | "user" | "message" | "coinflipGame" | "note" | "checklistItem" | "verificationToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1092,6 +1126,80 @@ export namespace Prisma {
           }
         }
       }
+      CoinflipGame: {
+        payload: Prisma.$CoinflipGamePayload<ExtArgs>
+        fields: Prisma.CoinflipGameFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CoinflipGameFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CoinflipGameFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload>
+          }
+          findFirst: {
+            args: Prisma.CoinflipGameFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CoinflipGameFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload>
+          }
+          findMany: {
+            args: Prisma.CoinflipGameFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload>[]
+          }
+          create: {
+            args: Prisma.CoinflipGameCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload>
+          }
+          createMany: {
+            args: Prisma.CoinflipGameCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CoinflipGameCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload>[]
+          }
+          delete: {
+            args: Prisma.CoinflipGameDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload>
+          }
+          update: {
+            args: Prisma.CoinflipGameUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload>
+          }
+          deleteMany: {
+            args: Prisma.CoinflipGameDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CoinflipGameUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CoinflipGameUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload>[]
+          }
+          upsert: {
+            args: Prisma.CoinflipGameUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CoinflipGamePayload>
+          }
+          aggregate: {
+            args: Prisma.CoinflipGameAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCoinflipGame>
+          }
+          groupBy: {
+            args: Prisma.CoinflipGameGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CoinflipGameGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CoinflipGameCountArgs<ExtArgs>
+            result: $Utils.Optional<CoinflipGameCountAggregateOutputType> | number
+          }
+        }
+      }
       Note: {
         payload: Prisma.$NotePayload<ExtArgs>
         fields: Prisma.NoteFieldRefs
@@ -1415,6 +1523,7 @@ export namespace Prisma {
     session?: SessionOmit
     user?: UserOmit
     message?: MessageOmit
+    coinflipGame?: CoinflipGameOmit
     note?: NoteOmit
     checklistItem?: ChecklistItemOmit
     verificationToken?: VerificationTokenOmit
@@ -1504,6 +1613,8 @@ export namespace Prisma {
     notes: number
     checklistItems: number
     messages: number
+    coinflipsCreated: number
+    coinflipsJoined: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1513,6 +1624,8 @@ export namespace Prisma {
     notes?: boolean | UserCountOutputTypeCountNotesArgs
     checklistItems?: boolean | UserCountOutputTypeCountChecklistItemsArgs
     messages?: boolean | UserCountOutputTypeCountMessagesArgs
+    coinflipsCreated?: boolean | UserCountOutputTypeCountCoinflipsCreatedArgs
+    coinflipsJoined?: boolean | UserCountOutputTypeCountCoinflipsJoinedArgs
   }
 
   // Custom InputTypes
@@ -1566,6 +1679,20 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MessageWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCoinflipsCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CoinflipGameWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCoinflipsJoinedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CoinflipGameWhereInput
   }
 
 
@@ -4916,8 +5043,18 @@ export namespace Prisma {
 
   export type AggregateUser = {
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
+  }
+
+  export type UserAvgAggregateOutputType = {
+    points: number | null
+  }
+
+  export type UserSumAggregateOutputType = {
+    points: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -4928,6 +5065,7 @@ export namespace Prisma {
     image: string | null
     password: string | null
     lastSeen: Date | null
+    points: number | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -4938,6 +5076,7 @@ export namespace Prisma {
     image: string | null
     password: string | null
     lastSeen: Date | null
+    points: number | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -4948,9 +5087,18 @@ export namespace Prisma {
     image: number
     password: number
     lastSeen: number
+    points: number
     _all: number
   }
 
+
+  export type UserAvgAggregateInputType = {
+    points?: true
+  }
+
+  export type UserSumAggregateInputType = {
+    points?: true
+  }
 
   export type UserMinAggregateInputType = {
     id?: true
@@ -4960,6 +5108,7 @@ export namespace Prisma {
     image?: true
     password?: true
     lastSeen?: true
+    points?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -4970,6 +5119,7 @@ export namespace Prisma {
     image?: true
     password?: true
     lastSeen?: true
+    points?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -4980,6 +5130,7 @@ export namespace Prisma {
     image?: true
     password?: true
     lastSeen?: true
+    points?: true
     _all?: true
   }
 
@@ -5021,6 +5172,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: UserAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
@@ -5051,6 +5214,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: UserCountAggregateInputType | true
+    _avg?: UserAvgAggregateInputType
+    _sum?: UserSumAggregateInputType
     _min?: UserMinAggregateInputType
     _max?: UserMaxAggregateInputType
   }
@@ -5063,7 +5228,10 @@ export namespace Prisma {
     image: string | null
     password: string | null
     lastSeen: Date | null
+    points: number
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
@@ -5090,12 +5258,15 @@ export namespace Prisma {
     image?: boolean
     password?: boolean
     lastSeen?: boolean
+    points?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     posts?: boolean | User$postsArgs<ExtArgs>
     notes?: boolean | User$notesArgs<ExtArgs>
     checklistItems?: boolean | User$checklistItemsArgs<ExtArgs>
     messages?: boolean | User$messagesArgs<ExtArgs>
+    coinflipsCreated?: boolean | User$coinflipsCreatedArgs<ExtArgs>
+    coinflipsJoined?: boolean | User$coinflipsJoinedArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -5107,6 +5278,7 @@ export namespace Prisma {
     image?: boolean
     password?: boolean
     lastSeen?: boolean
+    points?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5117,6 +5289,7 @@ export namespace Prisma {
     image?: boolean
     password?: boolean
     lastSeen?: boolean
+    points?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -5127,9 +5300,10 @@ export namespace Prisma {
     image?: boolean
     password?: boolean
     lastSeen?: boolean
+    points?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "password" | "lastSeen", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "password" | "lastSeen" | "points", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
@@ -5137,6 +5311,8 @@ export namespace Prisma {
     notes?: boolean | User$notesArgs<ExtArgs>
     checklistItems?: boolean | User$checklistItemsArgs<ExtArgs>
     messages?: boolean | User$messagesArgs<ExtArgs>
+    coinflipsCreated?: boolean | User$coinflipsCreatedArgs<ExtArgs>
+    coinflipsJoined?: boolean | User$coinflipsJoinedArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -5151,6 +5327,8 @@ export namespace Prisma {
       notes: Prisma.$NotePayload<ExtArgs>[]
       checklistItems: Prisma.$ChecklistItemPayload<ExtArgs>[]
       messages: Prisma.$MessagePayload<ExtArgs>[]
+      coinflipsCreated: Prisma.$CoinflipGamePayload<ExtArgs>[]
+      coinflipsJoined: Prisma.$CoinflipGamePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5160,6 +5338,7 @@ export namespace Prisma {
       image: string | null
       password: string | null
       lastSeen: Date | null
+      points: number
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -5560,6 +5739,8 @@ export namespace Prisma {
     notes<T extends User$notesArgs<ExtArgs> = {}>(args?: Subset<T, User$notesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     checklistItems<T extends User$checklistItemsArgs<ExtArgs> = {}>(args?: Subset<T, User$checklistItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChecklistItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     messages<T extends User$messagesArgs<ExtArgs> = {}>(args?: Subset<T, User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    coinflipsCreated<T extends User$coinflipsCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$coinflipsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    coinflipsJoined<T extends User$coinflipsJoinedArgs<ExtArgs> = {}>(args?: Subset<T, User$coinflipsJoinedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5596,6 +5777,7 @@ export namespace Prisma {
     readonly image: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
     readonly lastSeen: FieldRef<"User", 'DateTime'>
+    readonly points: FieldRef<"User", 'Int'>
   }
     
 
@@ -6128,6 +6310,54 @@ export namespace Prisma {
   }
 
   /**
+   * User.coinflipsCreated
+   */
+  export type User$coinflipsCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    where?: CoinflipGameWhereInput
+    orderBy?: CoinflipGameOrderByWithRelationInput | CoinflipGameOrderByWithRelationInput[]
+    cursor?: CoinflipGameWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CoinflipGameScalarFieldEnum | CoinflipGameScalarFieldEnum[]
+  }
+
+  /**
+   * User.coinflipsJoined
+   */
+  export type User$coinflipsJoinedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    where?: CoinflipGameWhereInput
+    orderBy?: CoinflipGameOrderByWithRelationInput | CoinflipGameOrderByWithRelationInput[]
+    cursor?: CoinflipGameWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CoinflipGameScalarFieldEnum | CoinflipGameScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6161,6 +6391,7 @@ export namespace Prisma {
     content: string | null
     sharedNoteTitle: string | null
     sharedNoteContent: string | null
+    coinflipGameId: string | null
     createdAt: Date | null
     userId: string | null
   }
@@ -6170,6 +6401,7 @@ export namespace Prisma {
     content: string | null
     sharedNoteTitle: string | null
     sharedNoteContent: string | null
+    coinflipGameId: string | null
     createdAt: Date | null
     userId: string | null
   }
@@ -6179,6 +6411,7 @@ export namespace Prisma {
     content: number
     sharedNoteTitle: number
     sharedNoteContent: number
+    coinflipGameId: number
     createdAt: number
     userId: number
     _all: number
@@ -6190,6 +6423,7 @@ export namespace Prisma {
     content?: true
     sharedNoteTitle?: true
     sharedNoteContent?: true
+    coinflipGameId?: true
     createdAt?: true
     userId?: true
   }
@@ -6199,6 +6433,7 @@ export namespace Prisma {
     content?: true
     sharedNoteTitle?: true
     sharedNoteContent?: true
+    coinflipGameId?: true
     createdAt?: true
     userId?: true
   }
@@ -6208,6 +6443,7 @@ export namespace Prisma {
     content?: true
     sharedNoteTitle?: true
     sharedNoteContent?: true
+    coinflipGameId?: true
     createdAt?: true
     userId?: true
     _all?: true
@@ -6290,6 +6526,7 @@ export namespace Prisma {
     content: string
     sharedNoteTitle: string | null
     sharedNoteContent: string | null
+    coinflipGameId: string | null
     createdAt: Date
     userId: string
     _count: MessageCountAggregateOutputType | null
@@ -6316,9 +6553,11 @@ export namespace Prisma {
     content?: boolean
     sharedNoteTitle?: boolean
     sharedNoteContent?: boolean
+    coinflipGameId?: boolean
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    coinflipGame?: boolean | Message$coinflipGameArgs<ExtArgs>
   }, ExtArgs["result"]["message"]>
 
   export type MessageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -6326,9 +6565,11 @@ export namespace Prisma {
     content?: boolean
     sharedNoteTitle?: boolean
     sharedNoteContent?: boolean
+    coinflipGameId?: boolean
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    coinflipGame?: boolean | Message$coinflipGameArgs<ExtArgs>
   }, ExtArgs["result"]["message"]>
 
   export type MessageSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -6336,9 +6577,11 @@ export namespace Prisma {
     content?: boolean
     sharedNoteTitle?: boolean
     sharedNoteContent?: boolean
+    coinflipGameId?: boolean
     createdAt?: boolean
     userId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    coinflipGame?: boolean | Message$coinflipGameArgs<ExtArgs>
   }, ExtArgs["result"]["message"]>
 
   export type MessageSelectScalar = {
@@ -6346,31 +6589,37 @@ export namespace Prisma {
     content?: boolean
     sharedNoteTitle?: boolean
     sharedNoteContent?: boolean
+    coinflipGameId?: boolean
     createdAt?: boolean
     userId?: boolean
   }
 
-  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "content" | "sharedNoteTitle" | "sharedNoteContent" | "createdAt" | "userId", ExtArgs["result"]["message"]>
+  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "content" | "sharedNoteTitle" | "sharedNoteContent" | "coinflipGameId" | "createdAt" | "userId", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    coinflipGame?: boolean | Message$coinflipGameArgs<ExtArgs>
   }
   export type MessageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    coinflipGame?: boolean | Message$coinflipGameArgs<ExtArgs>
   }
   export type MessageIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    coinflipGame?: boolean | Message$coinflipGameArgs<ExtArgs>
   }
 
   export type $MessagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Message"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      coinflipGame: Prisma.$CoinflipGamePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       content: string
       sharedNoteTitle: string | null
       sharedNoteContent: string | null
+      coinflipGameId: string | null
       createdAt: Date
       userId: string
     }, ExtArgs["result"]["message"]>
@@ -6768,6 +7017,7 @@ export namespace Prisma {
   export interface Prisma__MessageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    coinflipGame<T extends Message$coinflipGameArgs<ExtArgs> = {}>(args?: Subset<T, Message$coinflipGameArgs<ExtArgs>>): Prisma__CoinflipGameClient<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6801,6 +7051,7 @@ export namespace Prisma {
     readonly content: FieldRef<"Message", 'String'>
     readonly sharedNoteTitle: FieldRef<"Message", 'String'>
     readonly sharedNoteContent: FieldRef<"Message", 'String'>
+    readonly coinflipGameId: FieldRef<"Message", 'String'>
     readonly createdAt: FieldRef<"Message", 'DateTime'>
     readonly userId: FieldRef<"Message", 'String'>
   }
@@ -7199,6 +7450,25 @@ export namespace Prisma {
   }
 
   /**
+   * Message.coinflipGame
+   */
+  export type Message$coinflipGameArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    where?: CoinflipGameWhereInput
+  }
+
+  /**
    * Message without action
    */
   export type MessageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7214,6 +7484,1174 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: MessageInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CoinflipGame
+   */
+
+  export type AggregateCoinflipGame = {
+    _count: CoinflipGameCountAggregateOutputType | null
+    _avg: CoinflipGameAvgAggregateOutputType | null
+    _sum: CoinflipGameSumAggregateOutputType | null
+    _min: CoinflipGameMinAggregateOutputType | null
+    _max: CoinflipGameMaxAggregateOutputType | null
+  }
+
+  export type CoinflipGameAvgAggregateOutputType = {
+    bet: number | null
+  }
+
+  export type CoinflipGameSumAggregateOutputType = {
+    bet: number | null
+  }
+
+  export type CoinflipGameMinAggregateOutputType = {
+    id: string | null
+    bet: number | null
+    status: $Enums.CoinflipStatus | null
+    winnerId: string | null
+    createdAt: Date | null
+    creatorId: string | null
+    joinerId: string | null
+  }
+
+  export type CoinflipGameMaxAggregateOutputType = {
+    id: string | null
+    bet: number | null
+    status: $Enums.CoinflipStatus | null
+    winnerId: string | null
+    createdAt: Date | null
+    creatorId: string | null
+    joinerId: string | null
+  }
+
+  export type CoinflipGameCountAggregateOutputType = {
+    id: number
+    bet: number
+    status: number
+    winnerId: number
+    createdAt: number
+    creatorId: number
+    joinerId: number
+    _all: number
+  }
+
+
+  export type CoinflipGameAvgAggregateInputType = {
+    bet?: true
+  }
+
+  export type CoinflipGameSumAggregateInputType = {
+    bet?: true
+  }
+
+  export type CoinflipGameMinAggregateInputType = {
+    id?: true
+    bet?: true
+    status?: true
+    winnerId?: true
+    createdAt?: true
+    creatorId?: true
+    joinerId?: true
+  }
+
+  export type CoinflipGameMaxAggregateInputType = {
+    id?: true
+    bet?: true
+    status?: true
+    winnerId?: true
+    createdAt?: true
+    creatorId?: true
+    joinerId?: true
+  }
+
+  export type CoinflipGameCountAggregateInputType = {
+    id?: true
+    bet?: true
+    status?: true
+    winnerId?: true
+    createdAt?: true
+    creatorId?: true
+    joinerId?: true
+    _all?: true
+  }
+
+  export type CoinflipGameAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CoinflipGame to aggregate.
+     */
+    where?: CoinflipGameWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CoinflipGames to fetch.
+     */
+    orderBy?: CoinflipGameOrderByWithRelationInput | CoinflipGameOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CoinflipGameWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CoinflipGames from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CoinflipGames.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CoinflipGames
+    **/
+    _count?: true | CoinflipGameCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CoinflipGameAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CoinflipGameSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CoinflipGameMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CoinflipGameMaxAggregateInputType
+  }
+
+  export type GetCoinflipGameAggregateType<T extends CoinflipGameAggregateArgs> = {
+        [P in keyof T & keyof AggregateCoinflipGame]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCoinflipGame[P]>
+      : GetScalarType<T[P], AggregateCoinflipGame[P]>
+  }
+
+
+
+
+  export type CoinflipGameGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CoinflipGameWhereInput
+    orderBy?: CoinflipGameOrderByWithAggregationInput | CoinflipGameOrderByWithAggregationInput[]
+    by: CoinflipGameScalarFieldEnum[] | CoinflipGameScalarFieldEnum
+    having?: CoinflipGameScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CoinflipGameCountAggregateInputType | true
+    _avg?: CoinflipGameAvgAggregateInputType
+    _sum?: CoinflipGameSumAggregateInputType
+    _min?: CoinflipGameMinAggregateInputType
+    _max?: CoinflipGameMaxAggregateInputType
+  }
+
+  export type CoinflipGameGroupByOutputType = {
+    id: string
+    bet: number
+    status: $Enums.CoinflipStatus
+    winnerId: string | null
+    createdAt: Date
+    creatorId: string
+    joinerId: string | null
+    _count: CoinflipGameCountAggregateOutputType | null
+    _avg: CoinflipGameAvgAggregateOutputType | null
+    _sum: CoinflipGameSumAggregateOutputType | null
+    _min: CoinflipGameMinAggregateOutputType | null
+    _max: CoinflipGameMaxAggregateOutputType | null
+  }
+
+  type GetCoinflipGameGroupByPayload<T extends CoinflipGameGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CoinflipGameGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CoinflipGameGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CoinflipGameGroupByOutputType[P]>
+            : GetScalarType<T[P], CoinflipGameGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CoinflipGameSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    bet?: boolean
+    status?: boolean
+    winnerId?: boolean
+    createdAt?: boolean
+    creatorId?: boolean
+    joinerId?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    joiner?: boolean | CoinflipGame$joinerArgs<ExtArgs>
+    message?: boolean | CoinflipGame$messageArgs<ExtArgs>
+  }, ExtArgs["result"]["coinflipGame"]>
+
+  export type CoinflipGameSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    bet?: boolean
+    status?: boolean
+    winnerId?: boolean
+    createdAt?: boolean
+    creatorId?: boolean
+    joinerId?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    joiner?: boolean | CoinflipGame$joinerArgs<ExtArgs>
+  }, ExtArgs["result"]["coinflipGame"]>
+
+  export type CoinflipGameSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    bet?: boolean
+    status?: boolean
+    winnerId?: boolean
+    createdAt?: boolean
+    creatorId?: boolean
+    joinerId?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    joiner?: boolean | CoinflipGame$joinerArgs<ExtArgs>
+  }, ExtArgs["result"]["coinflipGame"]>
+
+  export type CoinflipGameSelectScalar = {
+    id?: boolean
+    bet?: boolean
+    status?: boolean
+    winnerId?: boolean
+    createdAt?: boolean
+    creatorId?: boolean
+    joinerId?: boolean
+  }
+
+  export type CoinflipGameOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bet" | "status" | "winnerId" | "createdAt" | "creatorId" | "joinerId", ExtArgs["result"]["coinflipGame"]>
+  export type CoinflipGameInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    joiner?: boolean | CoinflipGame$joinerArgs<ExtArgs>
+    message?: boolean | CoinflipGame$messageArgs<ExtArgs>
+  }
+  export type CoinflipGameIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    joiner?: boolean | CoinflipGame$joinerArgs<ExtArgs>
+  }
+  export type CoinflipGameIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    joiner?: boolean | CoinflipGame$joinerArgs<ExtArgs>
+  }
+
+  export type $CoinflipGamePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CoinflipGame"
+    objects: {
+      creator: Prisma.$UserPayload<ExtArgs>
+      joiner: Prisma.$UserPayload<ExtArgs> | null
+      message: Prisma.$MessagePayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      bet: number
+      status: $Enums.CoinflipStatus
+      winnerId: string | null
+      createdAt: Date
+      creatorId: string
+      joinerId: string | null
+    }, ExtArgs["result"]["coinflipGame"]>
+    composites: {}
+  }
+
+  type CoinflipGameGetPayload<S extends boolean | null | undefined | CoinflipGameDefaultArgs> = $Result.GetResult<Prisma.$CoinflipGamePayload, S>
+
+  type CoinflipGameCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CoinflipGameFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CoinflipGameCountAggregateInputType | true
+    }
+
+  export interface CoinflipGameDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CoinflipGame'], meta: { name: 'CoinflipGame' } }
+    /**
+     * Find zero or one CoinflipGame that matches the filter.
+     * @param {CoinflipGameFindUniqueArgs} args - Arguments to find a CoinflipGame
+     * @example
+     * // Get one CoinflipGame
+     * const coinflipGame = await prisma.coinflipGame.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CoinflipGameFindUniqueArgs>(args: SelectSubset<T, CoinflipGameFindUniqueArgs<ExtArgs>>): Prisma__CoinflipGameClient<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CoinflipGame that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CoinflipGameFindUniqueOrThrowArgs} args - Arguments to find a CoinflipGame
+     * @example
+     * // Get one CoinflipGame
+     * const coinflipGame = await prisma.coinflipGame.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CoinflipGameFindUniqueOrThrowArgs>(args: SelectSubset<T, CoinflipGameFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CoinflipGameClient<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CoinflipGame that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CoinflipGameFindFirstArgs} args - Arguments to find a CoinflipGame
+     * @example
+     * // Get one CoinflipGame
+     * const coinflipGame = await prisma.coinflipGame.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CoinflipGameFindFirstArgs>(args?: SelectSubset<T, CoinflipGameFindFirstArgs<ExtArgs>>): Prisma__CoinflipGameClient<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CoinflipGame that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CoinflipGameFindFirstOrThrowArgs} args - Arguments to find a CoinflipGame
+     * @example
+     * // Get one CoinflipGame
+     * const coinflipGame = await prisma.coinflipGame.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CoinflipGameFindFirstOrThrowArgs>(args?: SelectSubset<T, CoinflipGameFindFirstOrThrowArgs<ExtArgs>>): Prisma__CoinflipGameClient<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CoinflipGames that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CoinflipGameFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CoinflipGames
+     * const coinflipGames = await prisma.coinflipGame.findMany()
+     * 
+     * // Get first 10 CoinflipGames
+     * const coinflipGames = await prisma.coinflipGame.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const coinflipGameWithIdOnly = await prisma.coinflipGame.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CoinflipGameFindManyArgs>(args?: SelectSubset<T, CoinflipGameFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CoinflipGame.
+     * @param {CoinflipGameCreateArgs} args - Arguments to create a CoinflipGame.
+     * @example
+     * // Create one CoinflipGame
+     * const CoinflipGame = await prisma.coinflipGame.create({
+     *   data: {
+     *     // ... data to create a CoinflipGame
+     *   }
+     * })
+     * 
+     */
+    create<T extends CoinflipGameCreateArgs>(args: SelectSubset<T, CoinflipGameCreateArgs<ExtArgs>>): Prisma__CoinflipGameClient<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CoinflipGames.
+     * @param {CoinflipGameCreateManyArgs} args - Arguments to create many CoinflipGames.
+     * @example
+     * // Create many CoinflipGames
+     * const coinflipGame = await prisma.coinflipGame.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CoinflipGameCreateManyArgs>(args?: SelectSubset<T, CoinflipGameCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CoinflipGames and returns the data saved in the database.
+     * @param {CoinflipGameCreateManyAndReturnArgs} args - Arguments to create many CoinflipGames.
+     * @example
+     * // Create many CoinflipGames
+     * const coinflipGame = await prisma.coinflipGame.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CoinflipGames and only return the `id`
+     * const coinflipGameWithIdOnly = await prisma.coinflipGame.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CoinflipGameCreateManyAndReturnArgs>(args?: SelectSubset<T, CoinflipGameCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CoinflipGame.
+     * @param {CoinflipGameDeleteArgs} args - Arguments to delete one CoinflipGame.
+     * @example
+     * // Delete one CoinflipGame
+     * const CoinflipGame = await prisma.coinflipGame.delete({
+     *   where: {
+     *     // ... filter to delete one CoinflipGame
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CoinflipGameDeleteArgs>(args: SelectSubset<T, CoinflipGameDeleteArgs<ExtArgs>>): Prisma__CoinflipGameClient<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CoinflipGame.
+     * @param {CoinflipGameUpdateArgs} args - Arguments to update one CoinflipGame.
+     * @example
+     * // Update one CoinflipGame
+     * const coinflipGame = await prisma.coinflipGame.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CoinflipGameUpdateArgs>(args: SelectSubset<T, CoinflipGameUpdateArgs<ExtArgs>>): Prisma__CoinflipGameClient<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CoinflipGames.
+     * @param {CoinflipGameDeleteManyArgs} args - Arguments to filter CoinflipGames to delete.
+     * @example
+     * // Delete a few CoinflipGames
+     * const { count } = await prisma.coinflipGame.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CoinflipGameDeleteManyArgs>(args?: SelectSubset<T, CoinflipGameDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CoinflipGames.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CoinflipGameUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CoinflipGames
+     * const coinflipGame = await prisma.coinflipGame.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CoinflipGameUpdateManyArgs>(args: SelectSubset<T, CoinflipGameUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CoinflipGames and returns the data updated in the database.
+     * @param {CoinflipGameUpdateManyAndReturnArgs} args - Arguments to update many CoinflipGames.
+     * @example
+     * // Update many CoinflipGames
+     * const coinflipGame = await prisma.coinflipGame.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CoinflipGames and only return the `id`
+     * const coinflipGameWithIdOnly = await prisma.coinflipGame.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CoinflipGameUpdateManyAndReturnArgs>(args: SelectSubset<T, CoinflipGameUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CoinflipGame.
+     * @param {CoinflipGameUpsertArgs} args - Arguments to update or create a CoinflipGame.
+     * @example
+     * // Update or create a CoinflipGame
+     * const coinflipGame = await prisma.coinflipGame.upsert({
+     *   create: {
+     *     // ... data to create a CoinflipGame
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CoinflipGame we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CoinflipGameUpsertArgs>(args: SelectSubset<T, CoinflipGameUpsertArgs<ExtArgs>>): Prisma__CoinflipGameClient<$Result.GetResult<Prisma.$CoinflipGamePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CoinflipGames.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CoinflipGameCountArgs} args - Arguments to filter CoinflipGames to count.
+     * @example
+     * // Count the number of CoinflipGames
+     * const count = await prisma.coinflipGame.count({
+     *   where: {
+     *     // ... the filter for the CoinflipGames we want to count
+     *   }
+     * })
+    **/
+    count<T extends CoinflipGameCountArgs>(
+      args?: Subset<T, CoinflipGameCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CoinflipGameCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CoinflipGame.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CoinflipGameAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CoinflipGameAggregateArgs>(args: Subset<T, CoinflipGameAggregateArgs>): Prisma.PrismaPromise<GetCoinflipGameAggregateType<T>>
+
+    /**
+     * Group by CoinflipGame.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CoinflipGameGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CoinflipGameGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CoinflipGameGroupByArgs['orderBy'] }
+        : { orderBy?: CoinflipGameGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CoinflipGameGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCoinflipGameGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CoinflipGame model
+   */
+  readonly fields: CoinflipGameFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CoinflipGame.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CoinflipGameClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    creator<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    joiner<T extends CoinflipGame$joinerArgs<ExtArgs> = {}>(args?: Subset<T, CoinflipGame$joinerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    message<T extends CoinflipGame$messageArgs<ExtArgs> = {}>(args?: Subset<T, CoinflipGame$messageArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CoinflipGame model
+   */
+  interface CoinflipGameFieldRefs {
+    readonly id: FieldRef<"CoinflipGame", 'String'>
+    readonly bet: FieldRef<"CoinflipGame", 'Int'>
+    readonly status: FieldRef<"CoinflipGame", 'CoinflipStatus'>
+    readonly winnerId: FieldRef<"CoinflipGame", 'String'>
+    readonly createdAt: FieldRef<"CoinflipGame", 'DateTime'>
+    readonly creatorId: FieldRef<"CoinflipGame", 'String'>
+    readonly joinerId: FieldRef<"CoinflipGame", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CoinflipGame findUnique
+   */
+  export type CoinflipGameFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    /**
+     * Filter, which CoinflipGame to fetch.
+     */
+    where: CoinflipGameWhereUniqueInput
+  }
+
+  /**
+   * CoinflipGame findUniqueOrThrow
+   */
+  export type CoinflipGameFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    /**
+     * Filter, which CoinflipGame to fetch.
+     */
+    where: CoinflipGameWhereUniqueInput
+  }
+
+  /**
+   * CoinflipGame findFirst
+   */
+  export type CoinflipGameFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    /**
+     * Filter, which CoinflipGame to fetch.
+     */
+    where?: CoinflipGameWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CoinflipGames to fetch.
+     */
+    orderBy?: CoinflipGameOrderByWithRelationInput | CoinflipGameOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CoinflipGames.
+     */
+    cursor?: CoinflipGameWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CoinflipGames from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CoinflipGames.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CoinflipGames.
+     */
+    distinct?: CoinflipGameScalarFieldEnum | CoinflipGameScalarFieldEnum[]
+  }
+
+  /**
+   * CoinflipGame findFirstOrThrow
+   */
+  export type CoinflipGameFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    /**
+     * Filter, which CoinflipGame to fetch.
+     */
+    where?: CoinflipGameWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CoinflipGames to fetch.
+     */
+    orderBy?: CoinflipGameOrderByWithRelationInput | CoinflipGameOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CoinflipGames.
+     */
+    cursor?: CoinflipGameWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CoinflipGames from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CoinflipGames.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CoinflipGames.
+     */
+    distinct?: CoinflipGameScalarFieldEnum | CoinflipGameScalarFieldEnum[]
+  }
+
+  /**
+   * CoinflipGame findMany
+   */
+  export type CoinflipGameFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    /**
+     * Filter, which CoinflipGames to fetch.
+     */
+    where?: CoinflipGameWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CoinflipGames to fetch.
+     */
+    orderBy?: CoinflipGameOrderByWithRelationInput | CoinflipGameOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CoinflipGames.
+     */
+    cursor?: CoinflipGameWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CoinflipGames from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CoinflipGames.
+     */
+    skip?: number
+    distinct?: CoinflipGameScalarFieldEnum | CoinflipGameScalarFieldEnum[]
+  }
+
+  /**
+   * CoinflipGame create
+   */
+  export type CoinflipGameCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CoinflipGame.
+     */
+    data: XOR<CoinflipGameCreateInput, CoinflipGameUncheckedCreateInput>
+  }
+
+  /**
+   * CoinflipGame createMany
+   */
+  export type CoinflipGameCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CoinflipGames.
+     */
+    data: CoinflipGameCreateManyInput | CoinflipGameCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CoinflipGame createManyAndReturn
+   */
+  export type CoinflipGameCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * The data used to create many CoinflipGames.
+     */
+    data: CoinflipGameCreateManyInput | CoinflipGameCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CoinflipGame update
+   */
+  export type CoinflipGameUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CoinflipGame.
+     */
+    data: XOR<CoinflipGameUpdateInput, CoinflipGameUncheckedUpdateInput>
+    /**
+     * Choose, which CoinflipGame to update.
+     */
+    where: CoinflipGameWhereUniqueInput
+  }
+
+  /**
+   * CoinflipGame updateMany
+   */
+  export type CoinflipGameUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CoinflipGames.
+     */
+    data: XOR<CoinflipGameUpdateManyMutationInput, CoinflipGameUncheckedUpdateManyInput>
+    /**
+     * Filter which CoinflipGames to update
+     */
+    where?: CoinflipGameWhereInput
+    /**
+     * Limit how many CoinflipGames to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CoinflipGame updateManyAndReturn
+   */
+  export type CoinflipGameUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * The data used to update CoinflipGames.
+     */
+    data: XOR<CoinflipGameUpdateManyMutationInput, CoinflipGameUncheckedUpdateManyInput>
+    /**
+     * Filter which CoinflipGames to update
+     */
+    where?: CoinflipGameWhereInput
+    /**
+     * Limit how many CoinflipGames to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CoinflipGame upsert
+   */
+  export type CoinflipGameUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CoinflipGame to update in case it exists.
+     */
+    where: CoinflipGameWhereUniqueInput
+    /**
+     * In case the CoinflipGame found by the `where` argument doesn't exist, create a new CoinflipGame with this data.
+     */
+    create: XOR<CoinflipGameCreateInput, CoinflipGameUncheckedCreateInput>
+    /**
+     * In case the CoinflipGame was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CoinflipGameUpdateInput, CoinflipGameUncheckedUpdateInput>
+  }
+
+  /**
+   * CoinflipGame delete
+   */
+  export type CoinflipGameDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
+    /**
+     * Filter which CoinflipGame to delete.
+     */
+    where: CoinflipGameWhereUniqueInput
+  }
+
+  /**
+   * CoinflipGame deleteMany
+   */
+  export type CoinflipGameDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CoinflipGames to delete
+     */
+    where?: CoinflipGameWhereInput
+    /**
+     * Limit how many CoinflipGames to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CoinflipGame.joiner
+   */
+  export type CoinflipGame$joinerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * CoinflipGame.message
+   */
+  export type CoinflipGame$messageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    where?: MessageWhereInput
+  }
+
+  /**
+   * CoinflipGame without action
+   */
+  export type CoinflipGameDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CoinflipGame
+     */
+    select?: CoinflipGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CoinflipGame
+     */
+    omit?: CoinflipGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CoinflipGameInclude<ExtArgs> | null
   }
 
 
@@ -10376,7 +11814,8 @@ export namespace Prisma {
     emailVerified: 'emailVerified',
     image: 'image',
     password: 'password',
-    lastSeen: 'lastSeen'
+    lastSeen: 'lastSeen',
+    points: 'points'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -10387,11 +11826,25 @@ export namespace Prisma {
     content: 'content',
     sharedNoteTitle: 'sharedNoteTitle',
     sharedNoteContent: 'sharedNoteContent',
+    coinflipGameId: 'coinflipGameId',
     createdAt: 'createdAt',
     userId: 'userId'
   };
 
   export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+  export const CoinflipGameScalarFieldEnum: {
+    id: 'id',
+    bet: 'bet',
+    status: 'status',
+    winnerId: 'winnerId',
+    createdAt: 'createdAt',
+    creatorId: 'creatorId',
+    joinerId: 'joinerId'
+  };
+
+  export type CoinflipGameScalarFieldEnum = (typeof CoinflipGameScalarFieldEnum)[keyof typeof CoinflipGameScalarFieldEnum]
 
 
   export const NoteScalarFieldEnum: {
@@ -10494,6 +11947,20 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'CoinflipStatus'
+   */
+  export type EnumCoinflipStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoinflipStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'CoinflipStatus[]'
+   */
+  export type ListEnumCoinflipStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoinflipStatus[]'>
     
 
 
@@ -10737,12 +12204,15 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     password?: StringNullableFilter<"User"> | string | null
     lastSeen?: DateTimeNullableFilter<"User"> | Date | string | null
+    points?: IntFilter<"User"> | number
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     posts?: PostListRelationFilter
     notes?: NoteListRelationFilter
     checklistItems?: ChecklistItemListRelationFilter
     messages?: MessageListRelationFilter
+    coinflipsCreated?: CoinflipGameListRelationFilter
+    coinflipsJoined?: CoinflipGameListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -10753,12 +12223,15 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     password?: SortOrderInput | SortOrder
     lastSeen?: SortOrderInput | SortOrder
+    points?: SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     posts?: PostOrderByRelationAggregateInput
     notes?: NoteOrderByRelationAggregateInput
     checklistItems?: ChecklistItemOrderByRelationAggregateInput
     messages?: MessageOrderByRelationAggregateInput
+    coinflipsCreated?: CoinflipGameOrderByRelationAggregateInput
+    coinflipsJoined?: CoinflipGameOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -10772,12 +12245,15 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     password?: StringNullableFilter<"User"> | string | null
     lastSeen?: DateTimeNullableFilter<"User"> | Date | string | null
+    points?: IntFilter<"User"> | number
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     posts?: PostListRelationFilter
     notes?: NoteListRelationFilter
     checklistItems?: ChecklistItemListRelationFilter
     messages?: MessageListRelationFilter
+    coinflipsCreated?: CoinflipGameListRelationFilter
+    coinflipsJoined?: CoinflipGameListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -10788,9 +12264,12 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     password?: SortOrderInput | SortOrder
     lastSeen?: SortOrderInput | SortOrder
+    points?: SortOrder
     _count?: UserCountOrderByAggregateInput
+    _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
+    _sum?: UserSumOrderByAggregateInput
   }
 
   export type UserScalarWhereWithAggregatesInput = {
@@ -10804,6 +12283,7 @@ export namespace Prisma {
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     password?: StringNullableWithAggregatesFilter<"User"> | string | null
     lastSeen?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    points?: IntWithAggregatesFilter<"User"> | number
   }
 
   export type MessageWhereInput = {
@@ -10814,9 +12294,11 @@ export namespace Prisma {
     content?: StringFilter<"Message"> | string
     sharedNoteTitle?: StringNullableFilter<"Message"> | string | null
     sharedNoteContent?: StringNullableFilter<"Message"> | string | null
+    coinflipGameId?: StringNullableFilter<"Message"> | string | null
     createdAt?: DateTimeFilter<"Message"> | Date | string
     userId?: StringFilter<"Message"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    coinflipGame?: XOR<CoinflipGameNullableScalarRelationFilter, CoinflipGameWhereInput> | null
   }
 
   export type MessageOrderByWithRelationInput = {
@@ -10824,13 +12306,16 @@ export namespace Prisma {
     content?: SortOrder
     sharedNoteTitle?: SortOrderInput | SortOrder
     sharedNoteContent?: SortOrderInput | SortOrder
+    coinflipGameId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
     user?: UserOrderByWithRelationInput
+    coinflipGame?: CoinflipGameOrderByWithRelationInput
   }
 
   export type MessageWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    coinflipGameId?: string
     AND?: MessageWhereInput | MessageWhereInput[]
     OR?: MessageWhereInput[]
     NOT?: MessageWhereInput | MessageWhereInput[]
@@ -10840,13 +12325,15 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Message"> | Date | string
     userId?: StringFilter<"Message"> | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id">
+    coinflipGame?: XOR<CoinflipGameNullableScalarRelationFilter, CoinflipGameWhereInput> | null
+  }, "id" | "coinflipGameId">
 
   export type MessageOrderByWithAggregationInput = {
     id?: SortOrder
     content?: SortOrder
     sharedNoteTitle?: SortOrderInput | SortOrder
     sharedNoteContent?: SortOrderInput | SortOrder
+    coinflipGameId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
     _count?: MessageCountOrderByAggregateInput
@@ -10862,8 +12349,82 @@ export namespace Prisma {
     content?: StringWithAggregatesFilter<"Message"> | string
     sharedNoteTitle?: StringNullableWithAggregatesFilter<"Message"> | string | null
     sharedNoteContent?: StringNullableWithAggregatesFilter<"Message"> | string | null
+    coinflipGameId?: StringNullableWithAggregatesFilter<"Message"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
     userId?: StringWithAggregatesFilter<"Message"> | string
+  }
+
+  export type CoinflipGameWhereInput = {
+    AND?: CoinflipGameWhereInput | CoinflipGameWhereInput[]
+    OR?: CoinflipGameWhereInput[]
+    NOT?: CoinflipGameWhereInput | CoinflipGameWhereInput[]
+    id?: StringFilter<"CoinflipGame"> | string
+    bet?: IntFilter<"CoinflipGame"> | number
+    status?: EnumCoinflipStatusFilter<"CoinflipGame"> | $Enums.CoinflipStatus
+    winnerId?: StringNullableFilter<"CoinflipGame"> | string | null
+    createdAt?: DateTimeFilter<"CoinflipGame"> | Date | string
+    creatorId?: StringFilter<"CoinflipGame"> | string
+    joinerId?: StringNullableFilter<"CoinflipGame"> | string | null
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+    joiner?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    message?: XOR<MessageNullableScalarRelationFilter, MessageWhereInput> | null
+  }
+
+  export type CoinflipGameOrderByWithRelationInput = {
+    id?: SortOrder
+    bet?: SortOrder
+    status?: SortOrder
+    winnerId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    creatorId?: SortOrder
+    joinerId?: SortOrderInput | SortOrder
+    creator?: UserOrderByWithRelationInput
+    joiner?: UserOrderByWithRelationInput
+    message?: MessageOrderByWithRelationInput
+  }
+
+  export type CoinflipGameWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CoinflipGameWhereInput | CoinflipGameWhereInput[]
+    OR?: CoinflipGameWhereInput[]
+    NOT?: CoinflipGameWhereInput | CoinflipGameWhereInput[]
+    bet?: IntFilter<"CoinflipGame"> | number
+    status?: EnumCoinflipStatusFilter<"CoinflipGame"> | $Enums.CoinflipStatus
+    winnerId?: StringNullableFilter<"CoinflipGame"> | string | null
+    createdAt?: DateTimeFilter<"CoinflipGame"> | Date | string
+    creatorId?: StringFilter<"CoinflipGame"> | string
+    joinerId?: StringNullableFilter<"CoinflipGame"> | string | null
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+    joiner?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    message?: XOR<MessageNullableScalarRelationFilter, MessageWhereInput> | null
+  }, "id">
+
+  export type CoinflipGameOrderByWithAggregationInput = {
+    id?: SortOrder
+    bet?: SortOrder
+    status?: SortOrder
+    winnerId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    creatorId?: SortOrder
+    joinerId?: SortOrderInput | SortOrder
+    _count?: CoinflipGameCountOrderByAggregateInput
+    _avg?: CoinflipGameAvgOrderByAggregateInput
+    _max?: CoinflipGameMaxOrderByAggregateInput
+    _min?: CoinflipGameMinOrderByAggregateInput
+    _sum?: CoinflipGameSumOrderByAggregateInput
+  }
+
+  export type CoinflipGameScalarWhereWithAggregatesInput = {
+    AND?: CoinflipGameScalarWhereWithAggregatesInput | CoinflipGameScalarWhereWithAggregatesInput[]
+    OR?: CoinflipGameScalarWhereWithAggregatesInput[]
+    NOT?: CoinflipGameScalarWhereWithAggregatesInput | CoinflipGameScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CoinflipGame"> | string
+    bet?: IntWithAggregatesFilter<"CoinflipGame"> | number
+    status?: EnumCoinflipStatusWithAggregatesFilter<"CoinflipGame"> | $Enums.CoinflipStatus
+    winnerId?: StringNullableWithAggregatesFilter<"CoinflipGame"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"CoinflipGame"> | Date | string
+    creatorId?: StringWithAggregatesFilter<"CoinflipGame"> | string
+    joinerId?: StringNullableWithAggregatesFilter<"CoinflipGame"> | string | null
   }
 
   export type NoteWhereInput = {
@@ -11243,12 +12804,15 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutCreatedByInput
     notes?: NoteCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameCreateNestedManyWithoutJoinerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -11259,12 +12823,15 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
     notes?: NoteUncheckedCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameUncheckedCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameUncheckedCreateNestedManyWithoutJoinerInput
   }
 
   export type UserUpdateInput = {
@@ -11275,12 +12842,15 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -11291,12 +12861,15 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUncheckedUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUncheckedUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUncheckedUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -11307,6 +12880,7 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
   }
 
   export type UserUpdateManyMutationInput = {
@@ -11317,6 +12891,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -11327,6 +12902,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
   }
 
   export type MessageCreateInput = {
@@ -11336,6 +12912,7 @@ export namespace Prisma {
     sharedNoteContent?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutMessagesInput
+    coinflipGame?: CoinflipGameCreateNestedOneWithoutMessageInput
   }
 
   export type MessageUncheckedCreateInput = {
@@ -11343,6 +12920,7 @@ export namespace Prisma {
     content?: string
     sharedNoteTitle?: string | null
     sharedNoteContent?: string | null
+    coinflipGameId?: string | null
     createdAt?: Date | string
     userId: string
   }
@@ -11354,6 +12932,7 @@ export namespace Prisma {
     sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+    coinflipGame?: CoinflipGameUpdateOneWithoutMessageNestedInput
   }
 
   export type MessageUncheckedUpdateInput = {
@@ -11361,6 +12940,7 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
     sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
+    coinflipGameId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
   }
@@ -11370,6 +12950,7 @@ export namespace Prisma {
     content?: string
     sharedNoteTitle?: string | null
     sharedNoteContent?: string | null
+    coinflipGameId?: string | null
     createdAt?: Date | string
     userId: string
   }
@@ -11387,8 +12968,81 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
     sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
+    coinflipGameId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type CoinflipGameCreateInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    creator: UserCreateNestedOneWithoutCoinflipsCreatedInput
+    joiner?: UserCreateNestedOneWithoutCoinflipsJoinedInput
+    message?: MessageCreateNestedOneWithoutCoinflipGameInput
+  }
+
+  export type CoinflipGameUncheckedCreateInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    creatorId: string
+    joinerId?: string | null
+    message?: MessageUncheckedCreateNestedOneWithoutCoinflipGameInput
+  }
+
+  export type CoinflipGameUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutCoinflipsCreatedNestedInput
+    joiner?: UserUpdateOneWithoutCoinflipsJoinedNestedInput
+    message?: MessageUpdateOneWithoutCoinflipGameNestedInput
+  }
+
+  export type CoinflipGameUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creatorId?: StringFieldUpdateOperationsInput | string
+    joinerId?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: MessageUncheckedUpdateOneWithoutCoinflipGameNestedInput
+  }
+
+  export type CoinflipGameCreateManyInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    creatorId: string
+    joinerId?: string | null
+  }
+
+  export type CoinflipGameUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CoinflipGameUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creatorId?: StringFieldUpdateOperationsInput | string
+    joinerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type NoteCreateInput = {
@@ -11868,6 +13522,12 @@ export namespace Prisma {
     none?: MessageWhereInput
   }
 
+  export type CoinflipGameListRelationFilter = {
+    every?: CoinflipGameWhereInput
+    some?: CoinflipGameWhereInput
+    none?: CoinflipGameWhereInput
+  }
+
   export type AccountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -11892,6 +13552,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type CoinflipGameOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -11900,6 +13564,11 @@ export namespace Prisma {
     image?: SortOrder
     password?: SortOrder
     lastSeen?: SortOrder
+    points?: SortOrder
+  }
+
+  export type UserAvgOrderByAggregateInput = {
+    points?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -11910,6 +13579,7 @@ export namespace Prisma {
     image?: SortOrder
     password?: SortOrder
     lastSeen?: SortOrder
+    points?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -11920,6 +13590,11 @@ export namespace Prisma {
     image?: SortOrder
     password?: SortOrder
     lastSeen?: SortOrder
+    points?: SortOrder
+  }
+
+  export type UserSumOrderByAggregateInput = {
+    points?: SortOrder
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -11936,11 +13611,17 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type CoinflipGameNullableScalarRelationFilter = {
+    is?: CoinflipGameWhereInput | null
+    isNot?: CoinflipGameWhereInput | null
+  }
+
   export type MessageCountOrderByAggregateInput = {
     id?: SortOrder
     content?: SortOrder
     sharedNoteTitle?: SortOrder
     sharedNoteContent?: SortOrder
+    coinflipGameId?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
   }
@@ -11950,6 +13631,7 @@ export namespace Prisma {
     content?: SortOrder
     sharedNoteTitle?: SortOrder
     sharedNoteContent?: SortOrder
+    coinflipGameId?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
   }
@@ -11959,8 +13641,74 @@ export namespace Prisma {
     content?: SortOrder
     sharedNoteTitle?: SortOrder
     sharedNoteContent?: SortOrder
+    coinflipGameId?: SortOrder
     createdAt?: SortOrder
     userId?: SortOrder
+  }
+
+  export type EnumCoinflipStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinflipStatus | EnumCoinflipStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CoinflipStatus[] | ListEnumCoinflipStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CoinflipStatus[] | ListEnumCoinflipStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCoinflipStatusFilter<$PrismaModel> | $Enums.CoinflipStatus
+  }
+
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type MessageNullableScalarRelationFilter = {
+    is?: MessageWhereInput | null
+    isNot?: MessageWhereInput | null
+  }
+
+  export type CoinflipGameCountOrderByAggregateInput = {
+    id?: SortOrder
+    bet?: SortOrder
+    status?: SortOrder
+    winnerId?: SortOrder
+    createdAt?: SortOrder
+    creatorId?: SortOrder
+    joinerId?: SortOrder
+  }
+
+  export type CoinflipGameAvgOrderByAggregateInput = {
+    bet?: SortOrder
+  }
+
+  export type CoinflipGameMaxOrderByAggregateInput = {
+    id?: SortOrder
+    bet?: SortOrder
+    status?: SortOrder
+    winnerId?: SortOrder
+    createdAt?: SortOrder
+    creatorId?: SortOrder
+    joinerId?: SortOrder
+  }
+
+  export type CoinflipGameMinOrderByAggregateInput = {
+    id?: SortOrder
+    bet?: SortOrder
+    status?: SortOrder
+    winnerId?: SortOrder
+    createdAt?: SortOrder
+    creatorId?: SortOrder
+    joinerId?: SortOrder
+  }
+
+  export type CoinflipGameSumOrderByAggregateInput = {
+    bet?: SortOrder
+  }
+
+  export type EnumCoinflipStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinflipStatus | EnumCoinflipStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CoinflipStatus[] | ListEnumCoinflipStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CoinflipStatus[] | ListEnumCoinflipStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCoinflipStatusWithAggregatesFilter<$PrismaModel> | $Enums.CoinflipStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCoinflipStatusFilter<$PrismaModel>
+    _max?: NestedEnumCoinflipStatusFilter<$PrismaModel>
   }
 
   export type NoteCountOrderByAggregateInput = {
@@ -12162,6 +13910,20 @@ export namespace Prisma {
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
   }
 
+  export type CoinflipGameCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<CoinflipGameCreateWithoutCreatorInput, CoinflipGameUncheckedCreateWithoutCreatorInput> | CoinflipGameCreateWithoutCreatorInput[] | CoinflipGameUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutCreatorInput | CoinflipGameCreateOrConnectWithoutCreatorInput[]
+    createMany?: CoinflipGameCreateManyCreatorInputEnvelope
+    connect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+  }
+
+  export type CoinflipGameCreateNestedManyWithoutJoinerInput = {
+    create?: XOR<CoinflipGameCreateWithoutJoinerInput, CoinflipGameUncheckedCreateWithoutJoinerInput> | CoinflipGameCreateWithoutJoinerInput[] | CoinflipGameUncheckedCreateWithoutJoinerInput[]
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutJoinerInput | CoinflipGameCreateOrConnectWithoutJoinerInput[]
+    createMany?: CoinflipGameCreateManyJoinerInputEnvelope
+    connect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -12202,6 +13964,20 @@ export namespace Prisma {
     connectOrCreate?: MessageCreateOrConnectWithoutUserInput | MessageCreateOrConnectWithoutUserInput[]
     createMany?: MessageCreateManyUserInputEnvelope
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type CoinflipGameUncheckedCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<CoinflipGameCreateWithoutCreatorInput, CoinflipGameUncheckedCreateWithoutCreatorInput> | CoinflipGameCreateWithoutCreatorInput[] | CoinflipGameUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutCreatorInput | CoinflipGameCreateOrConnectWithoutCreatorInput[]
+    createMany?: CoinflipGameCreateManyCreatorInputEnvelope
+    connect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+  }
+
+  export type CoinflipGameUncheckedCreateNestedManyWithoutJoinerInput = {
+    create?: XOR<CoinflipGameCreateWithoutJoinerInput, CoinflipGameUncheckedCreateWithoutJoinerInput> | CoinflipGameCreateWithoutJoinerInput[] | CoinflipGameUncheckedCreateWithoutJoinerInput[]
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutJoinerInput | CoinflipGameCreateOrConnectWithoutJoinerInput[]
+    createMany?: CoinflipGameCreateManyJoinerInputEnvelope
+    connect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -12292,6 +14068,34 @@ export namespace Prisma {
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
+  export type CoinflipGameUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<CoinflipGameCreateWithoutCreatorInput, CoinflipGameUncheckedCreateWithoutCreatorInput> | CoinflipGameCreateWithoutCreatorInput[] | CoinflipGameUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutCreatorInput | CoinflipGameCreateOrConnectWithoutCreatorInput[]
+    upsert?: CoinflipGameUpsertWithWhereUniqueWithoutCreatorInput | CoinflipGameUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: CoinflipGameCreateManyCreatorInputEnvelope
+    set?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    disconnect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    delete?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    connect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    update?: CoinflipGameUpdateWithWhereUniqueWithoutCreatorInput | CoinflipGameUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: CoinflipGameUpdateManyWithWhereWithoutCreatorInput | CoinflipGameUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: CoinflipGameScalarWhereInput | CoinflipGameScalarWhereInput[]
+  }
+
+  export type CoinflipGameUpdateManyWithoutJoinerNestedInput = {
+    create?: XOR<CoinflipGameCreateWithoutJoinerInput, CoinflipGameUncheckedCreateWithoutJoinerInput> | CoinflipGameCreateWithoutJoinerInput[] | CoinflipGameUncheckedCreateWithoutJoinerInput[]
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutJoinerInput | CoinflipGameCreateOrConnectWithoutJoinerInput[]
+    upsert?: CoinflipGameUpsertWithWhereUniqueWithoutJoinerInput | CoinflipGameUpsertWithWhereUniqueWithoutJoinerInput[]
+    createMany?: CoinflipGameCreateManyJoinerInputEnvelope
+    set?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    disconnect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    delete?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    connect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    update?: CoinflipGameUpdateWithWhereUniqueWithoutJoinerInput | CoinflipGameUpdateWithWhereUniqueWithoutJoinerInput[]
+    updateMany?: CoinflipGameUpdateManyWithWhereWithoutJoinerInput | CoinflipGameUpdateManyWithWhereWithoutJoinerInput[]
+    deleteMany?: CoinflipGameScalarWhereInput | CoinflipGameScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -12376,10 +14180,44 @@ export namespace Prisma {
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
+  export type CoinflipGameUncheckedUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<CoinflipGameCreateWithoutCreatorInput, CoinflipGameUncheckedCreateWithoutCreatorInput> | CoinflipGameCreateWithoutCreatorInput[] | CoinflipGameUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutCreatorInput | CoinflipGameCreateOrConnectWithoutCreatorInput[]
+    upsert?: CoinflipGameUpsertWithWhereUniqueWithoutCreatorInput | CoinflipGameUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: CoinflipGameCreateManyCreatorInputEnvelope
+    set?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    disconnect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    delete?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    connect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    update?: CoinflipGameUpdateWithWhereUniqueWithoutCreatorInput | CoinflipGameUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: CoinflipGameUpdateManyWithWhereWithoutCreatorInput | CoinflipGameUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: CoinflipGameScalarWhereInput | CoinflipGameScalarWhereInput[]
+  }
+
+  export type CoinflipGameUncheckedUpdateManyWithoutJoinerNestedInput = {
+    create?: XOR<CoinflipGameCreateWithoutJoinerInput, CoinflipGameUncheckedCreateWithoutJoinerInput> | CoinflipGameCreateWithoutJoinerInput[] | CoinflipGameUncheckedCreateWithoutJoinerInput[]
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutJoinerInput | CoinflipGameCreateOrConnectWithoutJoinerInput[]
+    upsert?: CoinflipGameUpsertWithWhereUniqueWithoutJoinerInput | CoinflipGameUpsertWithWhereUniqueWithoutJoinerInput[]
+    createMany?: CoinflipGameCreateManyJoinerInputEnvelope
+    set?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    disconnect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    delete?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    connect?: CoinflipGameWhereUniqueInput | CoinflipGameWhereUniqueInput[]
+    update?: CoinflipGameUpdateWithWhereUniqueWithoutJoinerInput | CoinflipGameUpdateWithWhereUniqueWithoutJoinerInput[]
+    updateMany?: CoinflipGameUpdateManyWithWhereWithoutJoinerInput | CoinflipGameUpdateManyWithWhereWithoutJoinerInput[]
+    deleteMany?: CoinflipGameScalarWhereInput | CoinflipGameScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutMessagesInput = {
     create?: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
     connectOrCreate?: UserCreateOrConnectWithoutMessagesInput
     connect?: UserWhereUniqueInput
+  }
+
+  export type CoinflipGameCreateNestedOneWithoutMessageInput = {
+    create?: XOR<CoinflipGameCreateWithoutMessageInput, CoinflipGameUncheckedCreateWithoutMessageInput>
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutMessageInput
+    connect?: CoinflipGameWhereUniqueInput
   }
 
   export type UserUpdateOneRequiredWithoutMessagesNestedInput = {
@@ -12388,6 +14226,82 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutMessagesInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMessagesInput, UserUpdateWithoutMessagesInput>, UserUncheckedUpdateWithoutMessagesInput>
+  }
+
+  export type CoinflipGameUpdateOneWithoutMessageNestedInput = {
+    create?: XOR<CoinflipGameCreateWithoutMessageInput, CoinflipGameUncheckedCreateWithoutMessageInput>
+    connectOrCreate?: CoinflipGameCreateOrConnectWithoutMessageInput
+    upsert?: CoinflipGameUpsertWithoutMessageInput
+    disconnect?: CoinflipGameWhereInput | boolean
+    delete?: CoinflipGameWhereInput | boolean
+    connect?: CoinflipGameWhereUniqueInput
+    update?: XOR<XOR<CoinflipGameUpdateToOneWithWhereWithoutMessageInput, CoinflipGameUpdateWithoutMessageInput>, CoinflipGameUncheckedUpdateWithoutMessageInput>
+  }
+
+  export type UserCreateNestedOneWithoutCoinflipsCreatedInput = {
+    create?: XOR<UserCreateWithoutCoinflipsCreatedInput, UserUncheckedCreateWithoutCoinflipsCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCoinflipsCreatedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutCoinflipsJoinedInput = {
+    create?: XOR<UserCreateWithoutCoinflipsJoinedInput, UserUncheckedCreateWithoutCoinflipsJoinedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCoinflipsJoinedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type MessageCreateNestedOneWithoutCoinflipGameInput = {
+    create?: XOR<MessageCreateWithoutCoinflipGameInput, MessageUncheckedCreateWithoutCoinflipGameInput>
+    connectOrCreate?: MessageCreateOrConnectWithoutCoinflipGameInput
+    connect?: MessageWhereUniqueInput
+  }
+
+  export type MessageUncheckedCreateNestedOneWithoutCoinflipGameInput = {
+    create?: XOR<MessageCreateWithoutCoinflipGameInput, MessageUncheckedCreateWithoutCoinflipGameInput>
+    connectOrCreate?: MessageCreateOrConnectWithoutCoinflipGameInput
+    connect?: MessageWhereUniqueInput
+  }
+
+  export type EnumCoinflipStatusFieldUpdateOperationsInput = {
+    set?: $Enums.CoinflipStatus
+  }
+
+  export type UserUpdateOneRequiredWithoutCoinflipsCreatedNestedInput = {
+    create?: XOR<UserCreateWithoutCoinflipsCreatedInput, UserUncheckedCreateWithoutCoinflipsCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCoinflipsCreatedInput
+    upsert?: UserUpsertWithoutCoinflipsCreatedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCoinflipsCreatedInput, UserUpdateWithoutCoinflipsCreatedInput>, UserUncheckedUpdateWithoutCoinflipsCreatedInput>
+  }
+
+  export type UserUpdateOneWithoutCoinflipsJoinedNestedInput = {
+    create?: XOR<UserCreateWithoutCoinflipsJoinedInput, UserUncheckedCreateWithoutCoinflipsJoinedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCoinflipsJoinedInput
+    upsert?: UserUpsertWithoutCoinflipsJoinedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCoinflipsJoinedInput, UserUpdateWithoutCoinflipsJoinedInput>, UserUncheckedUpdateWithoutCoinflipsJoinedInput>
+  }
+
+  export type MessageUpdateOneWithoutCoinflipGameNestedInput = {
+    create?: XOR<MessageCreateWithoutCoinflipGameInput, MessageUncheckedCreateWithoutCoinflipGameInput>
+    connectOrCreate?: MessageCreateOrConnectWithoutCoinflipGameInput
+    upsert?: MessageUpsertWithoutCoinflipGameInput
+    disconnect?: MessageWhereInput | boolean
+    delete?: MessageWhereInput | boolean
+    connect?: MessageWhereUniqueInput
+    update?: XOR<XOR<MessageUpdateToOneWithWhereWithoutCoinflipGameInput, MessageUpdateWithoutCoinflipGameInput>, MessageUncheckedUpdateWithoutCoinflipGameInput>
+  }
+
+  export type MessageUncheckedUpdateOneWithoutCoinflipGameNestedInput = {
+    create?: XOR<MessageCreateWithoutCoinflipGameInput, MessageUncheckedCreateWithoutCoinflipGameInput>
+    connectOrCreate?: MessageCreateOrConnectWithoutCoinflipGameInput
+    upsert?: MessageUpsertWithoutCoinflipGameInput
+    disconnect?: MessageWhereInput | boolean
+    delete?: MessageWhereInput | boolean
+    connect?: MessageWhereUniqueInput
+    update?: XOR<XOR<MessageUpdateToOneWithWhereWithoutCoinflipGameInput, MessageUpdateWithoutCoinflipGameInput>, MessageUncheckedUpdateWithoutCoinflipGameInput>
   }
 
   export type UserCreateNestedOneWithoutNotesInput = {
@@ -12610,6 +14524,23 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumCoinflipStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinflipStatus | EnumCoinflipStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CoinflipStatus[] | ListEnumCoinflipStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CoinflipStatus[] | ListEnumCoinflipStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCoinflipStatusFilter<$PrismaModel> | $Enums.CoinflipStatus
+  }
+
+  export type NestedEnumCoinflipStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinflipStatus | EnumCoinflipStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CoinflipStatus[] | ListEnumCoinflipStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CoinflipStatus[] | ListEnumCoinflipStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCoinflipStatusWithAggregatesFilter<$PrismaModel> | $Enums.CoinflipStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCoinflipStatusFilter<$PrismaModel>
+    _max?: NestedEnumCoinflipStatusFilter<$PrismaModel>
+  }
+
   export type NestedBoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -12631,11 +14562,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     notes?: NoteCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameCreateNestedManyWithoutJoinerInput
   }
 
   export type UserUncheckedCreateWithoutPostsInput = {
@@ -12646,11 +14580,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     notes?: NoteUncheckedCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameUncheckedCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameUncheckedCreateNestedManyWithoutJoinerInput
   }
 
   export type UserCreateOrConnectWithoutPostsInput = {
@@ -12677,11 +14614,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     notes?: NoteUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPostsInput = {
@@ -12692,11 +14632,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     notes?: NoteUncheckedUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUncheckedUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUncheckedUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -12707,11 +14650,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     sessions?: SessionCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutCreatedByInput
     notes?: NoteCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameCreateNestedManyWithoutJoinerInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -12722,11 +14668,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
     notes?: NoteUncheckedCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameUncheckedCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameUncheckedCreateNestedManyWithoutJoinerInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -12753,11 +14702,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     sessions?: SessionUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -12768,11 +14720,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUncheckedUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUncheckedUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUncheckedUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -12783,11 +14738,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutCreatedByInput
     notes?: NoteCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameCreateNestedManyWithoutJoinerInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -12798,11 +14756,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
     notes?: NoteUncheckedCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameUncheckedCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameUncheckedCreateNestedManyWithoutJoinerInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -12829,11 +14790,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -12844,11 +14808,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUncheckedUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUncheckedUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUncheckedUpdateManyWithoutJoinerNestedInput
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -12992,6 +14959,7 @@ export namespace Prisma {
     sharedNoteTitle?: string | null
     sharedNoteContent?: string | null
     createdAt?: Date | string
+    coinflipGame?: CoinflipGameCreateNestedOneWithoutMessageInput
   }
 
   export type MessageUncheckedCreateWithoutUserInput = {
@@ -12999,6 +14967,7 @@ export namespace Prisma {
     content?: string
     sharedNoteTitle?: string | null
     sharedNoteContent?: string | null
+    coinflipGameId?: string | null
     createdAt?: Date | string
   }
 
@@ -13009,6 +14978,66 @@ export namespace Prisma {
 
   export type MessageCreateManyUserInputEnvelope = {
     data: MessageCreateManyUserInput | MessageCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CoinflipGameCreateWithoutCreatorInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    joiner?: UserCreateNestedOneWithoutCoinflipsJoinedInput
+    message?: MessageCreateNestedOneWithoutCoinflipGameInput
+  }
+
+  export type CoinflipGameUncheckedCreateWithoutCreatorInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    joinerId?: string | null
+    message?: MessageUncheckedCreateNestedOneWithoutCoinflipGameInput
+  }
+
+  export type CoinflipGameCreateOrConnectWithoutCreatorInput = {
+    where: CoinflipGameWhereUniqueInput
+    create: XOR<CoinflipGameCreateWithoutCreatorInput, CoinflipGameUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type CoinflipGameCreateManyCreatorInputEnvelope = {
+    data: CoinflipGameCreateManyCreatorInput | CoinflipGameCreateManyCreatorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CoinflipGameCreateWithoutJoinerInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    creator: UserCreateNestedOneWithoutCoinflipsCreatedInput
+    message?: MessageCreateNestedOneWithoutCoinflipGameInput
+  }
+
+  export type CoinflipGameUncheckedCreateWithoutJoinerInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    creatorId: string
+    message?: MessageUncheckedCreateNestedOneWithoutCoinflipGameInput
+  }
+
+  export type CoinflipGameCreateOrConnectWithoutJoinerInput = {
+    where: CoinflipGameWhereUniqueInput
+    create: XOR<CoinflipGameCreateWithoutJoinerInput, CoinflipGameUncheckedCreateWithoutJoinerInput>
+  }
+
+  export type CoinflipGameCreateManyJoinerInputEnvelope = {
+    data: CoinflipGameCreateManyJoinerInput | CoinflipGameCreateManyJoinerInput[]
     skipDuplicates?: boolean
   }
 
@@ -13179,8 +15208,54 @@ export namespace Prisma {
     content?: StringFilter<"Message"> | string
     sharedNoteTitle?: StringNullableFilter<"Message"> | string | null
     sharedNoteContent?: StringNullableFilter<"Message"> | string | null
+    coinflipGameId?: StringNullableFilter<"Message"> | string | null
     createdAt?: DateTimeFilter<"Message"> | Date | string
     userId?: StringFilter<"Message"> | string
+  }
+
+  export type CoinflipGameUpsertWithWhereUniqueWithoutCreatorInput = {
+    where: CoinflipGameWhereUniqueInput
+    update: XOR<CoinflipGameUpdateWithoutCreatorInput, CoinflipGameUncheckedUpdateWithoutCreatorInput>
+    create: XOR<CoinflipGameCreateWithoutCreatorInput, CoinflipGameUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type CoinflipGameUpdateWithWhereUniqueWithoutCreatorInput = {
+    where: CoinflipGameWhereUniqueInput
+    data: XOR<CoinflipGameUpdateWithoutCreatorInput, CoinflipGameUncheckedUpdateWithoutCreatorInput>
+  }
+
+  export type CoinflipGameUpdateManyWithWhereWithoutCreatorInput = {
+    where: CoinflipGameScalarWhereInput
+    data: XOR<CoinflipGameUpdateManyMutationInput, CoinflipGameUncheckedUpdateManyWithoutCreatorInput>
+  }
+
+  export type CoinflipGameScalarWhereInput = {
+    AND?: CoinflipGameScalarWhereInput | CoinflipGameScalarWhereInput[]
+    OR?: CoinflipGameScalarWhereInput[]
+    NOT?: CoinflipGameScalarWhereInput | CoinflipGameScalarWhereInput[]
+    id?: StringFilter<"CoinflipGame"> | string
+    bet?: IntFilter<"CoinflipGame"> | number
+    status?: EnumCoinflipStatusFilter<"CoinflipGame"> | $Enums.CoinflipStatus
+    winnerId?: StringNullableFilter<"CoinflipGame"> | string | null
+    createdAt?: DateTimeFilter<"CoinflipGame"> | Date | string
+    creatorId?: StringFilter<"CoinflipGame"> | string
+    joinerId?: StringNullableFilter<"CoinflipGame"> | string | null
+  }
+
+  export type CoinflipGameUpsertWithWhereUniqueWithoutJoinerInput = {
+    where: CoinflipGameWhereUniqueInput
+    update: XOR<CoinflipGameUpdateWithoutJoinerInput, CoinflipGameUncheckedUpdateWithoutJoinerInput>
+    create: XOR<CoinflipGameCreateWithoutJoinerInput, CoinflipGameUncheckedCreateWithoutJoinerInput>
+  }
+
+  export type CoinflipGameUpdateWithWhereUniqueWithoutJoinerInput = {
+    where: CoinflipGameWhereUniqueInput
+    data: XOR<CoinflipGameUpdateWithoutJoinerInput, CoinflipGameUncheckedUpdateWithoutJoinerInput>
+  }
+
+  export type CoinflipGameUpdateManyWithWhereWithoutJoinerInput = {
+    where: CoinflipGameScalarWhereInput
+    data: XOR<CoinflipGameUpdateManyMutationInput, CoinflipGameUncheckedUpdateManyWithoutJoinerInput>
   }
 
   export type UserCreateWithoutMessagesInput = {
@@ -13191,11 +15266,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutCreatedByInput
     notes?: NoteCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameCreateNestedManyWithoutJoinerInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -13206,16 +15284,44 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
     notes?: NoteUncheckedCreateNestedManyWithoutUserInput
     checklistItems?: ChecklistItemUncheckedCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameUncheckedCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameUncheckedCreateNestedManyWithoutJoinerInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
+  }
+
+  export type CoinflipGameCreateWithoutMessageInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    creator: UserCreateNestedOneWithoutCoinflipsCreatedInput
+    joiner?: UserCreateNestedOneWithoutCoinflipsJoinedInput
+  }
+
+  export type CoinflipGameUncheckedCreateWithoutMessageInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    creatorId: string
+    joinerId?: string | null
+  }
+
+  export type CoinflipGameCreateOrConnectWithoutMessageInput = {
+    where: CoinflipGameWhereUniqueInput
+    create: XOR<CoinflipGameCreateWithoutMessageInput, CoinflipGameUncheckedCreateWithoutMessageInput>
   }
 
   export type UserUpsertWithoutMessagesInput = {
@@ -13237,11 +15343,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -13252,11 +15361,273 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUncheckedUpdateManyWithoutUserNestedInput
     checklistItems?: ChecklistItemUncheckedUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUncheckedUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUncheckedUpdateManyWithoutJoinerNestedInput
+  }
+
+  export type CoinflipGameUpsertWithoutMessageInput = {
+    update: XOR<CoinflipGameUpdateWithoutMessageInput, CoinflipGameUncheckedUpdateWithoutMessageInput>
+    create: XOR<CoinflipGameCreateWithoutMessageInput, CoinflipGameUncheckedCreateWithoutMessageInput>
+    where?: CoinflipGameWhereInput
+  }
+
+  export type CoinflipGameUpdateToOneWithWhereWithoutMessageInput = {
+    where?: CoinflipGameWhereInput
+    data: XOR<CoinflipGameUpdateWithoutMessageInput, CoinflipGameUncheckedUpdateWithoutMessageInput>
+  }
+
+  export type CoinflipGameUpdateWithoutMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutCoinflipsCreatedNestedInput
+    joiner?: UserUpdateOneWithoutCoinflipsJoinedNestedInput
+  }
+
+  export type CoinflipGameUncheckedUpdateWithoutMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creatorId?: StringFieldUpdateOperationsInput | string
+    joinerId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type UserCreateWithoutCoinflipsCreatedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    lastSeen?: Date | string | null
+    points?: number
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    posts?: PostCreateNestedManyWithoutCreatedByInput
+    notes?: NoteCreateNestedManyWithoutUserInput
+    checklistItems?: ChecklistItemCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    coinflipsJoined?: CoinflipGameCreateNestedManyWithoutJoinerInput
+  }
+
+  export type UserUncheckedCreateWithoutCoinflipsCreatedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    lastSeen?: Date | string | null
+    points?: number
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
+    notes?: NoteUncheckedCreateNestedManyWithoutUserInput
+    checklistItems?: ChecklistItemUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    coinflipsJoined?: CoinflipGameUncheckedCreateNestedManyWithoutJoinerInput
+  }
+
+  export type UserCreateOrConnectWithoutCoinflipsCreatedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCoinflipsCreatedInput, UserUncheckedCreateWithoutCoinflipsCreatedInput>
+  }
+
+  export type UserCreateWithoutCoinflipsJoinedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    lastSeen?: Date | string | null
+    points?: number
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    posts?: PostCreateNestedManyWithoutCreatedByInput
+    notes?: NoteCreateNestedManyWithoutUserInput
+    checklistItems?: ChecklistItemCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameCreateNestedManyWithoutCreatorInput
+  }
+
+  export type UserUncheckedCreateWithoutCoinflipsJoinedInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    password?: string | null
+    lastSeen?: Date | string | null
+    points?: number
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
+    notes?: NoteUncheckedCreateNestedManyWithoutUserInput
+    checklistItems?: ChecklistItemUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameUncheckedCreateNestedManyWithoutCreatorInput
+  }
+
+  export type UserCreateOrConnectWithoutCoinflipsJoinedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCoinflipsJoinedInput, UserUncheckedCreateWithoutCoinflipsJoinedInput>
+  }
+
+  export type MessageCreateWithoutCoinflipGameInput = {
+    id?: string
+    content?: string
+    sharedNoteTitle?: string | null
+    sharedNoteContent?: string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutMessagesInput
+  }
+
+  export type MessageUncheckedCreateWithoutCoinflipGameInput = {
+    id?: string
+    content?: string
+    sharedNoteTitle?: string | null
+    sharedNoteContent?: string | null
+    createdAt?: Date | string
+    userId: string
+  }
+
+  export type MessageCreateOrConnectWithoutCoinflipGameInput = {
+    where: MessageWhereUniqueInput
+    create: XOR<MessageCreateWithoutCoinflipGameInput, MessageUncheckedCreateWithoutCoinflipGameInput>
+  }
+
+  export type UserUpsertWithoutCoinflipsCreatedInput = {
+    update: XOR<UserUpdateWithoutCoinflipsCreatedInput, UserUncheckedUpdateWithoutCoinflipsCreatedInput>
+    create: XOR<UserCreateWithoutCoinflipsCreatedInput, UserUncheckedCreateWithoutCoinflipsCreatedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutCoinflipsCreatedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutCoinflipsCreatedInput, UserUncheckedUpdateWithoutCoinflipsCreatedInput>
+  }
+
+  export type UserUpdateWithoutCoinflipsCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    posts?: PostUpdateManyWithoutCreatedByNestedInput
+    notes?: NoteUpdateManyWithoutUserNestedInput
+    checklistItems?: ChecklistItemUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    coinflipsJoined?: CoinflipGameUpdateManyWithoutJoinerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCoinflipsCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
+    notes?: NoteUncheckedUpdateManyWithoutUserNestedInput
+    checklistItems?: ChecklistItemUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    coinflipsJoined?: CoinflipGameUncheckedUpdateManyWithoutJoinerNestedInput
+  }
+
+  export type UserUpsertWithoutCoinflipsJoinedInput = {
+    update: XOR<UserUpdateWithoutCoinflipsJoinedInput, UserUncheckedUpdateWithoutCoinflipsJoinedInput>
+    create: XOR<UserCreateWithoutCoinflipsJoinedInput, UserUncheckedCreateWithoutCoinflipsJoinedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutCoinflipsJoinedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutCoinflipsJoinedInput, UserUncheckedUpdateWithoutCoinflipsJoinedInput>
+  }
+
+  export type UserUpdateWithoutCoinflipsJoinedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    posts?: PostUpdateManyWithoutCreatedByNestedInput
+    notes?: NoteUpdateManyWithoutUserNestedInput
+    checklistItems?: ChecklistItemUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUpdateManyWithoutCreatorNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCoinflipsJoinedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
+    notes?: NoteUncheckedUpdateManyWithoutUserNestedInput
+    checklistItems?: ChecklistItemUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUncheckedUpdateManyWithoutCreatorNestedInput
+  }
+
+  export type MessageUpsertWithoutCoinflipGameInput = {
+    update: XOR<MessageUpdateWithoutCoinflipGameInput, MessageUncheckedUpdateWithoutCoinflipGameInput>
+    create: XOR<MessageCreateWithoutCoinflipGameInput, MessageUncheckedCreateWithoutCoinflipGameInput>
+    where?: MessageWhereInput
+  }
+
+  export type MessageUpdateToOneWithWhereWithoutCoinflipGameInput = {
+    where?: MessageWhereInput
+    data: XOR<MessageUpdateWithoutCoinflipGameInput, MessageUncheckedUpdateWithoutCoinflipGameInput>
+  }
+
+  export type MessageUpdateWithoutCoinflipGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+  }
+
+  export type MessageUncheckedUpdateWithoutCoinflipGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserCreateWithoutNotesInput = {
@@ -13267,11 +15638,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutCreatedByInput
     checklistItems?: ChecklistItemCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameCreateNestedManyWithoutJoinerInput
   }
 
   export type UserUncheckedCreateWithoutNotesInput = {
@@ -13282,11 +15656,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
     checklistItems?: ChecklistItemUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameUncheckedCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameUncheckedCreateNestedManyWithoutJoinerInput
   }
 
   export type UserCreateOrConnectWithoutNotesInput = {
@@ -13313,11 +15690,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutCreatedByNestedInput
     checklistItems?: ChecklistItemUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotesInput = {
@@ -13328,11 +15708,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
     checklistItems?: ChecklistItemUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUncheckedUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUncheckedUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserCreateWithoutChecklistItemsInput = {
@@ -13343,11 +15726,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutCreatedByInput
     notes?: NoteCreateNestedManyWithoutUserInput
     messages?: MessageCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameCreateNestedManyWithoutJoinerInput
   }
 
   export type UserUncheckedCreateWithoutChecklistItemsInput = {
@@ -13358,11 +15744,14 @@ export namespace Prisma {
     image?: string | null
     password?: string | null
     lastSeen?: Date | string | null
+    points?: number
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
     notes?: NoteUncheckedCreateNestedManyWithoutUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutUserInput
+    coinflipsCreated?: CoinflipGameUncheckedCreateNestedManyWithoutCreatorInput
+    coinflipsJoined?: CoinflipGameUncheckedCreateNestedManyWithoutJoinerInput
   }
 
   export type UserCreateOrConnectWithoutChecklistItemsInput = {
@@ -13389,11 +15778,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUpdateManyWithoutUserNestedInput
     messages?: MessageUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUpdateManyWithoutJoinerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutChecklistItemsInput = {
@@ -13404,11 +15796,14 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
     lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    points?: IntFieldUpdateOperationsInput | number
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
     notes?: NoteUncheckedUpdateManyWithoutUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
+    coinflipsCreated?: CoinflipGameUncheckedUpdateManyWithoutCreatorNestedInput
+    coinflipsJoined?: CoinflipGameUncheckedUpdateManyWithoutJoinerNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -13459,7 +15854,26 @@ export namespace Prisma {
     content?: string
     sharedNoteTitle?: string | null
     sharedNoteContent?: string | null
+    coinflipGameId?: string | null
     createdAt?: Date | string
+  }
+
+  export type CoinflipGameCreateManyCreatorInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    joinerId?: string | null
+  }
+
+  export type CoinflipGameCreateManyJoinerInput = {
+    id?: string
+    bet: number
+    status?: $Enums.CoinflipStatus
+    winnerId?: string | null
+    createdAt?: Date | string
+    creatorId: string
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -13596,6 +16010,7 @@ export namespace Prisma {
     sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
     sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    coinflipGame?: CoinflipGameUpdateOneWithoutMessageNestedInput
   }
 
   export type MessageUncheckedUpdateWithoutUserInput = {
@@ -13603,6 +16018,7 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
     sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
+    coinflipGameId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -13611,7 +16027,66 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     sharedNoteTitle?: NullableStringFieldUpdateOperationsInput | string | null
     sharedNoteContent?: NullableStringFieldUpdateOperationsInput | string | null
+    coinflipGameId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CoinflipGameUpdateWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    joiner?: UserUpdateOneWithoutCoinflipsJoinedNestedInput
+    message?: MessageUpdateOneWithoutCoinflipGameNestedInput
+  }
+
+  export type CoinflipGameUncheckedUpdateWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    joinerId?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: MessageUncheckedUpdateOneWithoutCoinflipGameNestedInput
+  }
+
+  export type CoinflipGameUncheckedUpdateManyWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    joinerId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type CoinflipGameUpdateWithoutJoinerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutCoinflipsCreatedNestedInput
+    message?: MessageUpdateOneWithoutCoinflipGameNestedInput
+  }
+
+  export type CoinflipGameUncheckedUpdateWithoutJoinerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creatorId?: StringFieldUpdateOperationsInput | string
+    message?: MessageUncheckedUpdateOneWithoutCoinflipGameNestedInput
+  }
+
+  export type CoinflipGameUncheckedUpdateManyWithoutJoinerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bet?: IntFieldUpdateOperationsInput | number
+    status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creatorId?: StringFieldUpdateOperationsInput | string
   }
 
 

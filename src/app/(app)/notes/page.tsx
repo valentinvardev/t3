@@ -31,11 +31,17 @@ export default function NotesPage() {
   });
 
   const [justShared, setJustShared] = useState<string | null>(null);
+  const [shareError, setShareError] = useState<string | null>(null);
 
   const shareToChat = api.messages.send.useMutation({
     onSuccess: (_data, vars) => {
       setJustShared(vars.sharedNoteTitle ?? null);
+      setShareError(null);
       setTimeout(() => setJustShared(null), 2000);
+    },
+    onError: (err) => {
+      setShareError(err.message);
+      setTimeout(() => setShareError(null), 3000);
     },
   });
 
@@ -76,6 +82,13 @@ export default function NotesPage() {
           New Note
         </button>
       </div>
+
+      {/* Share rate limit toast */}
+      {shareError && (
+        <div className="mx-5 mt-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm text-red-400 lg:mx-8">
+          {shareError}
+        </div>
+      )}
 
       {/* Mobile FAB */}
       <button
