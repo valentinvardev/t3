@@ -1,74 +1,83 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, CheckSquare, Trash2, Check } from "lucide-react";
+import { Plus, CheckSquare, Trash2, Check, Loader2 } from "lucide-react";
+import { api } from "~/trpc/react";
+import type { RouterOutputs } from "~/trpc/react";
 
-type Task = {
-  id: string;
-  label: string;
-  done: boolean;
-  createdAt: Date;
-};
-
-const SAMPLE_TASKS: Task[] = [
-  { id: "1", label: "Set up Supabase database", done: true, createdAt: new Date("2026-03-22") },
-  { id: "2", label: "Configure Prisma schema", done: true, createdAt: new Date("2026-03-22") },
-  { id: "3", label: "Deploy to Vercel", done: false, createdAt: new Date("2026-03-23") },
-  { id: "4", label: "Add authentication with Discord", done: false, createdAt: new Date("2026-03-23") },
-  { id: "5", label: "Write API routes with tRPC", done: false, createdAt: new Date("2026-03-24") },
-];
+type Item = RouterOutputs["checklist"]["getAll"][number];
 
 export default function ChecklistPage() {
-  const [tasks, setTasks] = useState<Task[]>(SAMPLE_TASKS);
+  const utils = api.useUtils();
   const [input, setInput] = useState("");
+
+  const { data: tasks = [], isLoading } = api.checklist.getAll.useQuery();
+
+  const create = api.checklist.create.useMutation({
+    onSuccess: async () => {
+      await utils.checklist.getAll.invalidate();
+      setInput("");
+    },
+  });
+
+  const toggle = api.checklist.toggle.useMutation({
+    onMutate: async ({ id, done }) => {
+      await utils.checklist.getAll.cancel();
+      const prev = utils.checklist.getAll.getData();
+      utils.checklist.getAll.setData(undefined, (old) =>
+        old?.map((t) => (t.id === id ? { ...t, done } : t)),
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) utils.checklist.getAll.setData(undefined, ctx.prev);
+    },
+    onSettled: () => utils.checklist.getAll.invalidate(),
+  });
+
+  const remove = api.checklist.delete.useMutation({
+    onSuccess: () => utils.checklist.getAll.invalidate(),
+  });
+
+  const clearCompleted = api.checklist.clearCompleted.useMutation({
+    onSuccess: () => utils.checklist.getAll.invalidate(),
+  });
 
   const pending = tasks.filter((t) => !t.done);
   const completed = tasks.filter((t) => t.done);
 
   function addTask() {
     if (!input.trim()) return;
-    setTasks([
-      ...tasks,
-      { id: crypto.randomUUID(), label: input.trim(), done: false, createdAt: new Date() },
-    ]);
-    setInput("");
-  }
-
-  function toggle(id: string) {
-    setTasks(tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
-  }
-
-  function deleteTask(id: string) {
-    setTasks(tasks.filter((t) => t.id !== id));
-  }
-
-  function clearCompleted() {
-    setTasks(tasks.filter((t) => !t.done));
+    create.mutate({ label: input.trim() });
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-8 py-5">
+      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-5 py-4 lg:px-8 lg:py-5">
         <div>
           <h1 className="text-xl font-semibold text-zinc-100">Checklist</h1>
           <p className="text-sm text-zinc-500">
-            {pending.length} remaining · {completed.length} completed
+            {isLoading
+              ? "Loading..."
+              : `${pending.length} remaining · ${completed.length} completed`}
           </p>
         </div>
         {completed.length > 0 && (
           <button
-            onClick={clearCompleted}
-            className="text-sm font-medium text-zinc-500 transition hover:text-red-400"
+            onClick={() => clearCompleted.mutate()}
+            disabled={clearCompleted.isPending}
+            className="flex items-center gap-1.5 text-sm font-medium text-zinc-500 transition hover:text-red-400 disabled:opacity-50"
           >
+            {clearCompleted.isPending && <Loader2 size={13} className="animate-spin" />}
             Clear completed
           </button>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-8">
+      <div className="flex-1 overflow-y-auto p-5 lg:p-8">
         <div className="mx-auto max-w-2xl">
-          {/* Add task input */}
+          {/* Add task */}
           <div className="mb-8 flex gap-3">
             <input
               type="text"
@@ -80,43 +89,65 @@ export default function ChecklistPage() {
             />
             <button
               onClick={addTask}
-              className="flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-400 active:scale-95"
+              disabled={create.isPending || !input.trim()}
+              className="flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-400 active:scale-95 disabled:opacity-50"
             >
-              <Plus size={16} strokeWidth={2.5} />
+              {create.isPending ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Plus size={16} strokeWidth={2.5} />
+              )}
               Add
             </button>
           </div>
 
-          {/* Pending tasks */}
-          {pending.length > 0 && (
+          {/* Loading */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-24">
+              <Loader2 size={24} className="animate-spin text-zinc-600" />
+            </div>
+          )}
+
+          {/* Pending */}
+          {!isLoading && pending.length > 0 && (
             <div className="mb-6">
               <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-600">
                 To do — {pending.length}
               </p>
               <div className="flex flex-col gap-2">
                 {pending.map((task) => (
-                  <TaskRow key={task.id} task={task} onToggle={toggle} onDelete={deleteTask} />
+                  <TaskRow
+                    key={task.id}
+                    task={task}
+                    onToggle={(id, done) => toggle.mutate({ id, done })}
+                    onDelete={(id) => remove.mutate({ id })}
+                  />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Completed tasks */}
-          {completed.length > 0 && (
+          {/* Completed */}
+          {!isLoading && completed.length > 0 && (
             <div>
               <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-600">
                 Completed — {completed.length}
               </p>
               <div className="flex flex-col gap-2">
                 {completed.map((task) => (
-                  <TaskRow key={task.id} task={task} onToggle={toggle} onDelete={deleteTask} />
+                  <TaskRow
+                    key={task.id}
+                    task={task}
+                    onToggle={(id, done) => toggle.mutate({ id, done })}
+                    onDelete={(id) => remove.mutate({ id })}
+                  />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Empty state */}
-          {tasks.length === 0 && (
+          {/* Empty */}
+          {!isLoading && tasks.length === 0 && (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <CheckSquare size={40} className="mb-3 text-zinc-700" />
               <p className="text-sm font-medium text-zinc-500">All clear</p>
@@ -134,14 +165,14 @@ function TaskRow({
   onToggle,
   onDelete,
 }: {
-  task: Task;
-  onToggle: (id: string) => void;
+  task: Item;
+  onToggle: (id: string, done: boolean) => void;
   onDelete: (id: string) => void;
 }) {
   return (
     <div className="group flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 transition hover:border-zinc-700">
       <button
-        onClick={() => onToggle(task.id)}
+        onClick={() => onToggle(task.id, !task.done)}
         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition ${
           task.done
             ? "border-indigo-500 bg-indigo-500"

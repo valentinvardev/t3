@@ -1,46 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, FileText, Trash2 } from "lucide-react";
-
-type Note = {
-  id: string;
-  title: string;
-  content: string;
-  updatedAt: Date;
-};
-
-const SAMPLE_NOTES: Note[] = [
-  {
-    id: "1",
-    title: "Project kickoff ideas",
-    content: "Think about the overall structure of the app. We need a clean API layer, good state management, and a consistent design system.",
-    updatedAt: new Date("2026-03-23"),
-  },
-  {
-    id: "2",
-    title: "Meeting notes — March 24",
-    content: "Discussed deployment pipeline. Agreed on Vercel + Supabase for the stack. Next step: set up CI/CD and environment variables.",
-    updatedAt: new Date("2026-03-24"),
-  },
-  {
-    id: "3",
-    title: "Reading list",
-    content: "- The Pragmatic Programmer\n- Clean Architecture\n- Designing Data-Intensive Applications",
-    updatedAt: new Date("2026-03-22"),
-  },
-];
+import { Plus, Search, FileText, Trash2, Loader2 } from "lucide-react";
+import { api } from "~/trpc/react";
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 export default function NotesPage() {
-  const [notes, setNotes] = useState<Note[]>(SAMPLE_NOTES);
+  const utils = api.useUtils();
   const [search, setSearch] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
+
+  const { data: notes = [], isLoading } = api.notes.getAll.useQuery();
+
+  const create = api.notes.create.useMutation({
+    onSuccess: async () => {
+      await utils.notes.getAll.invalidate();
+      setNewTitle("");
+      setNewContent("");
+      setShowNew(false);
+    },
+  });
+
+  const remove = api.notes.delete.useMutation({
+    onSuccess: () => utils.notes.getAll.invalidate(),
+  });
 
   const filtered = notes.filter(
     (n) =>
@@ -50,33 +38,19 @@ export default function NotesPage() {
 
   function addNote() {
     if (!newTitle.trim()) return;
-    setNotes([
-      {
-        id: crypto.randomUUID(),
-        title: newTitle.trim(),
-        content: newContent.trim(),
-        updatedAt: new Date(),
-      },
-      ...notes,
-    ]);
-    setNewTitle("");
-    setNewContent("");
-    setShowNew(false);
-  }
-
-  function deleteNote(id: string) {
-    setNotes(notes.filter((n) => n.id !== id));
+    create.mutate({ title: newTitle.trim(), content: newContent.trim() });
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-5 py-4 lg:px-8 lg:py-5">
         <div>
           <h1 className="text-xl font-semibold text-zinc-100">Notes</h1>
-          <p className="text-sm text-zinc-500">{notes.length} note{notes.length !== 1 ? "s" : ""}</p>
+          <p className="text-sm text-zinc-500">
+            {isLoading ? "Loading..." : `${notes.length} note${notes.length !== 1 ? "s" : ""}`}
+          </p>
         </div>
-        {/* Desktop button only */}
         <button
           onClick={() => setShowNew(true)}
           className="hidden items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-400 active:scale-95 lg:flex"
@@ -116,6 +90,7 @@ export default function NotesPage() {
               placeholder="Note title..."
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && addNote()}
               className="mb-3 w-full bg-transparent text-base font-semibold text-zinc-100 placeholder-zinc-600 outline-none"
             />
             <textarea
@@ -128,8 +103,10 @@ export default function NotesPage() {
             <div className="mt-4 flex gap-2">
               <button
                 onClick={addNote}
-                className="rounded-lg bg-indigo-500 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-indigo-400"
+                disabled={create.isPending || !newTitle.trim()}
+                className="flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-indigo-400 disabled:opacity-50"
               >
+                {create.isPending && <Loader2 size={13} className="animate-spin" />}
                 Save
               </button>
               <button
@@ -142,14 +119,28 @@ export default function NotesPage() {
           </div>
         )}
 
-        {/* Notes grid */}
-        {filtered.length === 0 ? (
+        {/* Loading */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 size={24} className="animate-spin text-zinc-600" />
+          </div>
+        )}
+
+        {/* Empty */}
+        {!isLoading && filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <FileText size={40} className="mb-3 text-zinc-700" />
-            <p className="text-sm font-medium text-zinc-500">No notes found</p>
-            <p className="text-sm text-zinc-600">Create your first note to get started</p>
+            <p className="text-sm font-medium text-zinc-500">
+              {search ? "No notes match your search" : "No notes yet"}
+            </p>
+            <p className="text-sm text-zinc-600">
+              {search ? "Try a different keyword" : "Tap + to create your first note"}
+            </p>
           </div>
-        ) : (
+        )}
+
+        {/* Notes grid */}
+        {!isLoading && filtered.length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((note) => (
               <div
@@ -157,7 +148,7 @@ export default function NotesPage() {
                 className="group relative rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition hover:border-zinc-700"
               >
                 <button
-                  onClick={() => deleteNote(note.id)}
+                  onClick={() => remove.mutate({ id: note.id })}
                   className="absolute right-3 top-3 hidden rounded-md p-1.5 text-zinc-600 transition hover:bg-red-500/10 hover:text-red-400 group-hover:flex"
                 >
                   <Trash2 size={14} />
