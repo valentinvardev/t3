@@ -15,35 +15,40 @@ body {
 }
 
 @keyframes coinSpin {
-  0%   { transform: rotateY(0deg) scale(1); }
-  50%  { transform: rotateY(900deg) scale(1.15); }
-  100% { transform: rotateY(1800deg) scale(1); }
+  0%   { transform: rotateY(0deg)    scaleX(1); }
+  12%  { transform: rotateY(216deg)  scaleX(0.1); }
+  25%  { transform: rotateY(432deg)  scaleX(1); }
+  37%  { transform: rotateY(648deg)  scaleX(0.1); }
+  50%  { transform: rotateY(864deg)  scaleX(1); }
+  62%  { transform: rotateY(1044deg) scaleX(0.1); }
+  75%  { transform: rotateY(1224deg) scaleX(1); }
+  87%  { transform: rotateY(1368deg) scaleX(0.1); }
+  100% { transform: rotateY(1440deg) scaleX(1); }
 }
 
 @keyframes winGlow {
   0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-  40%      { box-shadow: 0 0 24px 6px rgba(34, 197, 94, 0.45); }
+  40%      { box-shadow: 0 0 28px 8px rgba(34, 197, 94, 0.5); }
 }
 
 @keyframes loseShake {
   0%, 100%  { transform: translateX(0); }
-  15%       { transform: translateX(-5px); }
-  30%       { transform: translateX(5px); }
-  45%       { transform: translateX(-4px); }
-  60%       { transform: translateX(4px); }
-  75%       { transform: translateX(-2px); }
-  90%       { transform: translateX(2px); }
+  15%       { transform: translateX(-6px); }
+  30%       { transform: translateX(6px); }
+  45%       { transform: translateX(-5px); }
+  60%       { transform: translateX(5px); }
+  75%       { transform: translateX(-3px); }
+  90%       { transform: translateX(3px); }
 }
 
 .animate-coin-spin {
-  animation: coinSpin 2.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  transform-style: preserve-3d;
+  animation: coinSpin 2.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
 }
 
 .animate-win-glow {
-  animation: winGlow 1.2s ease-in-out 2;
+  animation: winGlow 1.1s ease-in-out 3;
 }
 
 .animate-lose-shake {
-  animation: loseShake 0.6s ease-in-out;
+  animation: loseShake 0.65s ease-in-out;
 }

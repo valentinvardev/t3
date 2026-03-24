@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   MessageCircle, X, Users, ArrowLeft, Send, Loader2, FileText, Coins,
 } from "lucide-react";
@@ -13,6 +13,8 @@ type CoinflipGame = NonNullable<Message["coinflipGame"]>;
 
 const ONLINE_THRESHOLD_MS = 60_000;
 const BET_PRESETS = [50, 100, 250, 500, 1000];
+// How long the flip animation plays before the result is revealed
+const FLIP_DURATION_MS = 2800;
 
 function isOnline(user: User) {
   if (!user.lastSeen) return false;
@@ -41,6 +43,33 @@ function formatTime(date: Date) {
   });
 }
 
+// ── Styled Coin ───────────────────────────────────────────────────────────────
+
+function CoinIcon({ size = 56, spinning = false }: { size?: number; spinning?: boolean }) {
+  return (
+    <div className={spinning ? "animate-coin-spin" : ""}>
+      <div
+        className="flex shrink-0 items-center justify-center rounded-full"
+        style={{
+          width: size,
+          height: size,
+          background: "linear-gradient(145deg, #52525b 0%, #27272a 65%, #18181b 100%)",
+          border: `${size >= 48 ? 3 : 2}px solid #f59e0b`,
+          boxShadow: spinning
+            ? "0 0 32px rgba(245,158,11,0.7), inset 0 1px 4px rgba(255,255,255,0.12)"
+            : "0 2px 10px rgba(245,158,11,0.25), inset 0 1px 3px rgba(255,255,255,0.08)",
+        }}
+      >
+        <Coins
+          size={Math.round(size * 0.42)}
+          className="text-amber-400"
+          strokeWidth={2}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ── Coinflip Card ─────────────────────────────────────────────────────────────
 
 interface CoinflipCardProps {
@@ -63,80 +92,95 @@ function CoinflipCard({
   const iLost = isParticipant && !!game.winnerId && !iWon;
   const winner = game.winnerId === game.creatorId ? game.creator : game.joiner;
 
+  // ── FLIPPING (both users see this during the animation window) ──
   if (isFlipping) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-amber-500/30 bg-zinc-800/60">
-        <div className="flex items-center gap-1.5 border-b border-amber-500/20 bg-amber-500/10 px-3 py-2">
+      <div className="overflow-hidden rounded-2xl border border-amber-500/40 bg-zinc-900">
+        {/* Header */}
+        <div className="flex items-center gap-1.5 border-b border-amber-500/20 bg-amber-500/8 px-3 py-2">
           <Coins size={11} className="text-amber-400" />
           <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-400">
-            Coinflip
+            Coinflip · Flipping…
           </span>
         </div>
-        <div className="flex flex-col items-center gap-3 px-4 py-5">
-          <div
-            className="animate-coin-spin flex h-14 w-14 items-center justify-center rounded-full text-2xl font-black"
-            style={{
-              background: "conic-gradient(from 0deg, #f59e0b, #fbbf24, #f59e0b, #d97706, #f59e0b)",
-              boxShadow: "0 0 20px rgba(245, 158, 11, 0.5)",
-            }}
-          >
-            🪙
+        {/* Players + coin */}
+        <div className="flex items-center justify-between gap-2 px-4 py-4">
+          {/* Creator */}
+          <div className="flex flex-col items-center gap-1.5">
+            <div
+              className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white ${avatarColor(game.creatorId)}`}
+            >
+              {avatar(game.creator.name)}
+            </div>
+            <span className="max-w-[60px] truncate text-xs font-medium text-zinc-300">
+              {game.creator.name ?? "Unknown"}
+            </span>
           </div>
-          <p className="text-sm font-semibold text-zinc-300">Flipping…</p>
+
+          {/* Spinning coin */}
+          <div className="flex flex-col items-center gap-2">
+            <CoinIcon size={52} spinning />
+            <span className="text-[10px] font-semibold text-amber-400">
+              {game.bet * 2} pts
+            </span>
+          </div>
+
+          {/* Joiner */}
+          <div className="flex flex-col items-center gap-1.5">
+            <div
+              className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white ${game.joinerId ? avatarColor(game.joinerId) : "bg-zinc-700"}`}
+            >
+              {avatar(game.joiner?.name)}
+            </div>
+            <span className="max-w-[60px] truncate text-xs font-medium text-zinc-300">
+              {game.joiner?.name ?? "Unknown"}
+            </span>
+          </div>
         </div>
       </div>
     );
   }
 
+  // ── WAITING ──
   if (game.status === "WAITING") {
     return (
-      <div className="overflow-hidden rounded-2xl border border-amber-500/30 bg-zinc-800/60">
-        <div className="flex items-center gap-1.5 border-b border-amber-500/20 bg-amber-500/10 px-3 py-2">
+      <div className="overflow-hidden rounded-2xl border border-amber-500/30 bg-zinc-900">
+        <div className="flex items-center gap-1.5 border-b border-amber-500/20 bg-amber-500/8 px-3 py-2">
           <Coins size={11} className="text-amber-400" />
           <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-400">
-            Coinflip · Waiting
+            Coinflip · Open
           </span>
         </div>
-        <div className="px-3 py-3">
-          <div className="mb-2 flex items-center gap-2">
-            <div
-              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${avatarColor(game.creatorId)}`}
-            >
-              {avatar(game.creator.name)}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-zinc-100">
-                {game.creator.name ?? "Unknown"}
-              </p>
-              <p className="text-xs text-zinc-500">is looking for a challenger</p>
-            </div>
+        <div className="flex items-center gap-3 px-3 py-3">
+          <CoinIcon size={40} />
+          <div className="flex-1 min-w-0">
+            <p className="truncate text-sm font-semibold text-zinc-100">
+              {game.creator.name ?? "Unknown"}
+            </p>
+            <p className="text-xs text-zinc-500">
+              Bet: <span className="font-semibold text-amber-400">{game.bet} pts</span>
+              <span className="mx-1 text-zinc-700">·</span>
+              Prize: <span className="font-semibold text-amber-400">{game.bet * 2} pts</span>
+            </p>
           </div>
-          <div className="mb-3 flex items-center justify-between rounded-lg bg-zinc-900/60 px-3 py-2">
-            <span className="text-xs text-zinc-500">Bet each</span>
-            <span className="font-bold text-amber-400">{game.bet} pts</span>
-          </div>
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2">
             {!isCreator && (
               <button
                 onClick={() => onJoin(game.id)}
                 disabled={joinPending}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-amber-500 py-1.5 text-xs font-semibold text-zinc-900 transition hover:bg-amber-400 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-zinc-900 transition hover:bg-amber-400 disabled:opacity-50"
               >
-                {joinPending ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : (
-                  <Coins size={12} />
-                )}
-                Join · {game.bet} pts
+                {joinPending ? <Loader2 size={11} className="animate-spin" /> : <Coins size={11} />}
+                Join
               </button>
             )}
             {isCreator && (
               <button
                 onClick={() => onCancel(game.id)}
                 disabled={cancelPending}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-zinc-700 py-1.5 text-xs font-semibold text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-200 disabled:opacity-50"
+                className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-500 transition hover:bg-zinc-800 hover:text-zinc-300 disabled:opacity-50"
               >
-                {cancelPending ? <Loader2 size={12} className="animate-spin" /> : "Cancel"}
+                {cancelPending ? <Loader2 size={11} className="animate-spin" /> : "Cancel"}
               </button>
             )}
           </div>
@@ -145,77 +189,77 @@ function CoinflipCard({
     );
   }
 
+  // ── FINISHED ──
   if (game.status === "FINISHED") {
     return (
       <div
-        className={`overflow-hidden rounded-2xl border bg-zinc-800/60 ${
-          iWon
-            ? "animate-win-glow border-emerald-500/50"
-            : iLost
-              ? "animate-lose-shake border-red-500/30"
-              : "border-zinc-700"
+        className={`overflow-hidden rounded-2xl border bg-zinc-900 ${
+          iWon ? "animate-win-glow border-emerald-500/50"
+          : iLost ? "animate-lose-shake border-red-500/30"
+          : "border-zinc-800"
         }`}
       >
-        <div className="flex items-center gap-1.5 border-b border-zinc-700 bg-zinc-800 px-3 py-2">
-          <Coins size={11} className="text-amber-400" />
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+        <div className="flex items-center gap-1.5 border-b border-zinc-800 bg-zinc-800/60 px-3 py-2">
+          <Coins size={11} className="text-zinc-500" />
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
             Coinflip · Finished
           </span>
         </div>
         <div className="px-3 py-3">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${avatarColor(game.creatorId)}`}
-              >
+          {/* Versus row */}
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <div className="flex flex-col items-center gap-1">
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${avatarColor(game.creatorId)}`}>
                 {avatar(game.creator.name)}
               </div>
-              <span className={`text-sm font-medium ${game.winnerId === game.creatorId ? "text-emerald-400" : "text-zinc-500 line-through"}`}>
+              <span className={`max-w-[64px] truncate text-xs font-medium ${game.winnerId === game.creatorId ? "text-emerald-400" : "text-zinc-600 line-through"}`}>
                 {game.creator.name ?? "Unknown"}
               </span>
             </div>
-            <span className="text-xs font-bold text-zinc-600">vs</span>
-            <div className="flex items-center gap-2">
-              <span className={`text-sm font-medium ${game.winnerId === game.joinerId ? "text-emerald-400" : "text-zinc-500 line-through"}`}>
-                {game.joiner?.name ?? "Unknown"}
-              </span>
-              <div
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${game.joinerId ? avatarColor(game.joinerId) : "bg-zinc-700"}`}
-              >
+
+            <div className="flex flex-col items-center gap-0.5">
+              <CoinIcon size={32} />
+              <span className="text-[10px] font-bold text-amber-400">+{game.bet * 2}</span>
+            </div>
+
+            <div className="flex flex-col items-center gap-1">
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${game.joinerId ? avatarColor(game.joinerId) : "bg-zinc-700"}`}>
                 {avatar(game.joiner?.name)}
               </div>
+              <span className={`max-w-[64px] truncate text-xs font-medium ${game.winnerId === game.joinerId ? "text-emerald-400" : "text-zinc-600 line-through"}`}>
+                {game.joiner?.name ?? "Unknown"}
+              </span>
             </div>
           </div>
-          <div className="flex items-center justify-between rounded-lg bg-zinc-900/60 px-3 py-2">
-            <div>
-              <p className="text-xs text-zinc-500">Winner</p>
-              <p className="text-sm font-bold text-emerald-400">{winner?.name ?? "Unknown"}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-zinc-500">Prize</p>
-              <p className="text-sm font-bold text-amber-400">+{game.bet * 2} pts</p>
-            </div>
+
+          {/* Result row */}
+          <div className={`rounded-lg px-3 py-2 text-center text-xs font-semibold ${
+            iWon ? "bg-emerald-500/10 text-emerald-400"
+            : iLost ? "bg-red-500/10 text-red-400"
+            : "bg-zinc-800 text-zinc-400"
+          }`}>
+            {iWon
+              ? `You won ${game.bet * 2} pts`
+              : iLost
+                ? `You lost ${game.bet} pts`
+                : `${winner?.name ?? "Unknown"} won ${game.bet * 2} pts`}
           </div>
-          {isParticipant && (
-            <p className={`mt-2 text-center text-xs font-semibold ${iWon ? "text-emerald-400" : "text-red-400"}`}>
-              {iWon ? `🏆 You won ${game.bet * 2} pts!` : `You lost ${game.bet} pts`}
-            </p>
-          )}
         </div>
       </div>
     );
   }
 
-  // CANCELLED
+  // ── CANCELLED ──
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-700/50 bg-zinc-800/40">
-      <div className="flex items-center gap-1.5 border-b border-zinc-700/50 bg-zinc-800/60 px-3 py-2">
-        <Coins size={11} className="text-zinc-600" />
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+    <div className="overflow-hidden rounded-2xl border border-zinc-800/60 bg-zinc-900/50">
+      <div className="flex items-center gap-1.5 border-b border-zinc-800/50 px-3 py-2">
+        <Coins size={11} className="text-zinc-700" />
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-700">
           Coinflip · Cancelled
         </span>
       </div>
-      <div className="px-3 py-2.5">
+      <div className="flex items-center gap-2.5 px-3 py-2.5">
+        <CoinIcon size={28} />
         <p className="text-xs text-zinc-600">
           {game.creator.name ?? "Unknown"} cancelled · {game.bet} pts refunded
         </p>
@@ -293,7 +337,10 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
   const [view, setView] = useState<"chat" | "users">("chat");
   const [input, setInput] = useState("");
   const [showBetSelector, setShowBetSelector] = useState(false);
-  const [flippingGameId, setFlippingGameId] = useState<string | null>(null);
+  // Set of gameIds currently in the flip animation window
+  const [flippingGames, setFlippingGames] = useState<Set<string>>(new Set());
+  // Track previous message states to detect WAITING→FINISHED transitions for all users
+  const prevMessagesRef = useRef<Message[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const { data: messages = [], isLoading } = api.messages.getRecent.useQuery(undefined, {
@@ -308,6 +355,39 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
 
   const onlineCount = users.filter(isOnline).length;
 
+  // Start flip animation for a game; auto-clears after FLIP_DURATION_MS
+  const addFlipping = useCallback((gameId: string) => {
+    setFlippingGames((prev) => {
+      if (prev.has(gameId)) return prev;
+      const next = new Set(prev);
+      next.add(gameId);
+      return next;
+    });
+    setTimeout(() => {
+      setFlippingGames((prev) => {
+        const next = new Set(prev);
+        next.delete(gameId);
+        return next;
+      });
+    }, FLIP_DURATION_MS);
+  }, []);
+
+  // Detect WAITING→FINISHED transitions via polling so ALL users see the animation
+  useEffect(() => {
+    const prev = prevMessagesRef.current;
+    messages.forEach((msg) => {
+      if (!msg.coinflipGame) return;
+      const prevMsg = prev.find((m) => m.id === msg.id);
+      if (
+        prevMsg?.coinflipGame?.status === "WAITING" &&
+        msg.coinflipGame.status === "FINISHED"
+      ) {
+        addFlipping(msg.coinflipGame.id);
+      }
+    });
+    prevMessagesRef.current = messages;
+  }, [messages, addFlipping]);
+
   const send = api.messages.send.useMutation({
     onSuccess: () => utils.messages.getRecent.invalidate(),
   });
@@ -321,15 +401,11 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
   });
 
   const joinGame = api.coinflip.join.useMutation({
-    onMutate: ({ gameId }) => {
-      setFlippingGameId(gameId);
-    },
-    onSuccess: () => {
+    onSuccess: (game) => {
+      // Joiner gets immediate animation; other users get it via polling detection above
+      addFlipping(game.id);
       utils.messages.getRecent.invalidate();
       utils.users.me.invalidate();
-    },
-    onSettled: () => {
-      setTimeout(() => setFlippingGameId(null), 2500);
     },
   });
 
@@ -400,14 +476,14 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
 
               if (isCoinflip) {
                 return (
-                  <div key={msg.id} className="flex flex-col gap-0.5">
-                    <span className="text-xs font-medium text-zinc-500">
-                      {isMe ? "You" : (msg.user.name ?? "Unknown")}
+                  <div key={msg.id} className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-zinc-600">
+                      {isMe ? "You" : (msg.user.name ?? "Unknown")} started a coinflip
                     </span>
                     <CoinflipCard
                       game={msg.coinflipGame!}
                       currentUserId={session?.user?.id ?? ""}
-                      isFlipping={flippingGameId === msg.coinflipGame!.id}
+                      isFlipping={flippingGames.has(msg.coinflipGame!.id)}
                       onJoin={(id) => joinGame.mutate({ gameId: id })}
                       onCancel={(id) => cancelGame.mutate({ gameId: id })}
                       joinPending={joinGame.isPending}
@@ -436,9 +512,7 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
 
                     {isNote ? (
                       <div className={`w-full overflow-hidden rounded-2xl border bg-zinc-800/60 ${
-                        isMe
-                          ? "rounded-tr-sm border-indigo-500/40"
-                          : "rounded-tl-sm border-zinc-700"
+                        isMe ? "rounded-tr-sm border-indigo-500/40" : "rounded-tl-sm border-zinc-700"
                       }`}>
                         <div className={`flex items-center gap-1.5 border-b px-3 py-2 ${
                           isMe ? "border-indigo-500/20 bg-indigo-500/10" : "border-zinc-700 bg-zinc-800"
@@ -487,9 +561,17 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
 
       {/* Bet selector */}
       {showBetSelector && (
-        <div className="border-t border-zinc-800 bg-zinc-900 px-3 py-3">
-          <p className="mb-2 text-xs font-semibold text-zinc-400">Choose your bet</p>
-          <div className="mb-2 flex flex-wrap gap-1.5">
+        <div className="border-t border-zinc-800 bg-zinc-900/80 px-3 py-3">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-xs font-semibold text-zinc-400">Choose bet amount</p>
+            {me && (
+              <span className="flex items-center gap-1 text-[10px] text-zinc-600">
+                <Coins size={9} className="text-amber-500/60" />
+                {me.points} available
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
             {BET_PRESETS.map((amount) => {
               const canAfford = (me?.points ?? 0) >= amount;
               return (
@@ -499,8 +581,8 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
                   onClick={() => createGame.mutate({ bet: amount })}
                   className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                     canAfford
-                      ? "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25"
-                      : "cursor-not-allowed bg-zinc-800 text-zinc-600"
+                      ? "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 active:scale-95"
+                      : "cursor-not-allowed bg-zinc-800/50 text-zinc-700"
                   }`}
                 >
                   {createGame.isPending ? (
@@ -515,7 +597,7 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
           </div>
           <button
             onClick={() => setShowBetSelector(false)}
-            className="text-xs text-zinc-600 hover:text-zinc-400"
+            className="mt-2 text-xs text-zinc-600 transition hover:text-zinc-400"
           >
             Cancel
           </button>
@@ -537,7 +619,7 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
             <button
               onClick={() => setShowBetSelector(true)}
               title="Start a coinflip"
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-amber-500/70 transition hover:bg-amber-500/10 hover:text-amber-400"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-amber-500/60 transition hover:bg-amber-500/10 hover:text-amber-400"
             >
               <Coins size={15} />
             </button>
