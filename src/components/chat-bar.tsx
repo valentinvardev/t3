@@ -396,6 +396,10 @@ function UsersPanel({ onBack }: { onBack: () => void }) {
 function ChatPanel({ onClose }: { onClose: () => void }) {
   const { data: session } = useSession();
   const utils = api.useUtils();
+  /** Always-fresh ref so callbacks can call utils without stale closure. */
+  const utilsRef = useRef(utils);
+  useEffect(() => { utilsRef.current = utils; });
+
   const [view, setView]       = useState<"chat" | "users">("chat");
   const [input, setInput]     = useState("");
   const [betStep, setBetStep] = useState<null | "side" | "bet">(null);
@@ -409,6 +413,10 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
   /** Prevent double-triggering the same game across re-renders. */
   const triggeredRef = useRef<Set<string>>(new Set());
 
+  /** Balance delta badge — shown after animation completes. */
+  const prevPointsRef = useRef<number | undefined>(undefined);
+  const [pointsDelta, setPointsDelta] = useState<{ amount: number; key: number } | null>(null);
+
   const bottomRef = useRef<HTMLDivElement>(null);
 
   /**
@@ -419,13 +427,20 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
     refetchInterval: 1_500,
   });
   const { data: users = [] } = api.users.getAll.useQuery(undefined, { refetchInterval: 15_000 });
-  const { data: me }         = api.users.me.useQuery(undefined,    { refetchInterval: 10_000 });
+  // Pause me-polling while an animation is active so the balance doesn't jump
+  // mid-flip. triggerAnim invalidates me after the animation finishes instead.
+  const hasActiveAnim = gamePhases.size > 0;
+  const { data: me }  = api.users.me.useQuery(undefined, {
+    refetchInterval: hasActiveAnim ? false : 10_000,
+  });
 
   const onlineCount = users.filter(isOnline).length;
 
   /**
    * Advance a game through flipping → landing → result.
    * Safe to call multiple times — triggeredRef blocks re-entry.
+   * Invalidates users.me AFTER the animation so the balance update
+   * is only visible once the result is shown.
    */
   const triggerAnim = useCallback((gameId: string) => {
     if (triggeredRef.current.has(gameId)) return;
@@ -444,9 +459,22 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
           next.delete(gameId);
           return next;
         });
+        // Now safe to reveal the updated balance
+        void utilsRef.current.users.me.invalidate();
       }, LANDING_MS);
     }, FLIP_MS);
   }, []);
+
+  /** Show a floating +/- badge whenever the balance changes after animation. */
+  useEffect(() => {
+    if (me?.points === undefined) return;
+    if (prevPointsRef.current !== undefined && prevPointsRef.current !== me.points) {
+      const delta = me.points - prevPointsRef.current;
+      setPointsDelta({ amount: delta, key: Date.now() });
+      setTimeout(() => setPointsDelta(null), 2_300);
+    }
+    prevPointsRef.current = me.points;
+  }, [me?.points]);
 
   /**
    * On every poll: check each finished game — if resolvedAt is recent enough,
@@ -494,7 +522,8 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
       triggerAnim(game.id);
       // Still invalidate so a real refetch confirms the state
       utils.messages.getRecent.invalidate();
-      utils.users.me.invalidate();
+      // me.invalidate() is intentionally deferred to inside triggerAnim so the
+      // balance doesn't update before the animation reveals the result.
     },
   });
 
@@ -524,9 +553,19 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
       <div className="flex items-center gap-2 border-b border-zinc-800 px-4 py-3">
         <span className="flex-1 text-sm font-semibold text-zinc-100">Global Chat</span>
         {me && (
-          <div className="flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-1">
+          <div className="relative flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-1">
             <Coins size={12} className="text-amber-400" />
             <span className="text-xs font-bold text-amber-400">{me.points}</span>
+            {pointsDelta && (
+              <span
+                key={pointsDelta.key}
+                className={`animate-float-up pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold ${
+                  pointsDelta.amount > 0 ? "text-emerald-400" : "text-red-400"
+                }`}
+              >
+                {pointsDelta.amount > 0 ? `+${pointsDelta.amount}` : `${pointsDelta.amount}`}
+              </span>
+            )}
           </div>
         )}
         <button

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CheckSquare, FileText, Zap, LogOut, X, Coins } from "lucide-react";
@@ -25,7 +26,20 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user;
-  const { data: me } = api.users.me.useQuery(undefined, { refetchInterval: 10_000 });
+  const { data: me } = api.users.me.useQuery(undefined, { refetchInterval: 30_000 });
+
+  const prevPointsRef = useRef<number | undefined>(undefined);
+  const [pointsDelta, setPointsDelta] = useState<{ amount: number; key: number } | null>(null);
+
+  useEffect(() => {
+    if (me?.points === undefined) return;
+    if (prevPointsRef.current !== undefined && prevPointsRef.current !== me.points) {
+      const delta = me.points - prevPointsRef.current;
+      setPointsDelta({ amount: delta, key: Date.now() });
+      setTimeout(() => setPointsDelta(null), 2_300);
+    }
+    prevPointsRef.current = me.points;
+  }, [me?.points]);
 
   return (
     <aside className="flex h-full w-64 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900 text-zinc-400 lg:w-60">
@@ -88,9 +102,19 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
               <p className="truncate text-[10px] text-zinc-600">{user.email}</p>
             </div>
             {me && (
-              <div className="flex items-center gap-1 rounded-md bg-amber-500/10 px-1.5 py-0.5">
+              <div className="relative flex items-center gap-1 rounded-md bg-amber-500/10 px-1.5 py-0.5">
                 <Coins size={10} className="text-amber-400" />
                 <span className="text-[10px] font-bold text-amber-400">{me.points}</span>
+                {pointsDelta && (
+                  <span
+                    key={pointsDelta.key}
+                    className={`animate-float-up pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold ${
+                      pointsDelta.amount > 0 ? "text-emerald-400" : "text-red-400"
+                    }`}
+                  >
+                    {pointsDelta.amount > 0 ? `+${pointsDelta.amount}` : `${pointsDelta.amount}`}
+                  </span>
+                )}
               </div>
             )}
           </div>
