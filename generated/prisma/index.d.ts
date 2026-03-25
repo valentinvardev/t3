@@ -71,11 +71,23 @@ export namespace $Enums {
 
 export type CoinflipStatus = (typeof CoinflipStatus)[keyof typeof CoinflipStatus]
 
+
+export const CoinSide: {
+  HEADS: 'HEADS',
+  TAILS: 'TAILS'
+};
+
+export type CoinSide = (typeof CoinSide)[keyof typeof CoinSide]
+
 }
 
 export type CoinflipStatus = $Enums.CoinflipStatus
 
 export const CoinflipStatus: typeof $Enums.CoinflipStatus
+
+export type CoinSide = $Enums.CoinSide
+
+export const CoinSide: typeof $Enums.CoinSide
 
 /**
  * ##  Prisma Client ʲˢ
@@ -7511,7 +7523,10 @@ export namespace Prisma {
     id: string | null
     bet: number | null
     status: $Enums.CoinflipStatus | null
+    creatorSide: $Enums.CoinSide | null
+    result: $Enums.CoinSide | null
     winnerId: string | null
+    resolvedAt: Date | null
     createdAt: Date | null
     creatorId: string | null
     joinerId: string | null
@@ -7521,7 +7536,10 @@ export namespace Prisma {
     id: string | null
     bet: number | null
     status: $Enums.CoinflipStatus | null
+    creatorSide: $Enums.CoinSide | null
+    result: $Enums.CoinSide | null
     winnerId: string | null
+    resolvedAt: Date | null
     createdAt: Date | null
     creatorId: string | null
     joinerId: string | null
@@ -7531,7 +7549,10 @@ export namespace Prisma {
     id: number
     bet: number
     status: number
+    creatorSide: number
+    result: number
     winnerId: number
+    resolvedAt: number
     createdAt: number
     creatorId: number
     joinerId: number
@@ -7551,7 +7572,10 @@ export namespace Prisma {
     id?: true
     bet?: true
     status?: true
+    creatorSide?: true
+    result?: true
     winnerId?: true
+    resolvedAt?: true
     createdAt?: true
     creatorId?: true
     joinerId?: true
@@ -7561,7 +7585,10 @@ export namespace Prisma {
     id?: true
     bet?: true
     status?: true
+    creatorSide?: true
+    result?: true
     winnerId?: true
+    resolvedAt?: true
     createdAt?: true
     creatorId?: true
     joinerId?: true
@@ -7571,7 +7598,10 @@ export namespace Prisma {
     id?: true
     bet?: true
     status?: true
+    creatorSide?: true
+    result?: true
     winnerId?: true
+    resolvedAt?: true
     createdAt?: true
     creatorId?: true
     joinerId?: true
@@ -7668,7 +7698,10 @@ export namespace Prisma {
     id: string
     bet: number
     status: $Enums.CoinflipStatus
+    creatorSide: $Enums.CoinSide
+    result: $Enums.CoinSide | null
     winnerId: string | null
+    resolvedAt: Date | null
     createdAt: Date
     creatorId: string
     joinerId: string | null
@@ -7697,7 +7730,10 @@ export namespace Prisma {
     id?: boolean
     bet?: boolean
     status?: boolean
+    creatorSide?: boolean
+    result?: boolean
     winnerId?: boolean
+    resolvedAt?: boolean
     createdAt?: boolean
     creatorId?: boolean
     joinerId?: boolean
@@ -7710,7 +7746,10 @@ export namespace Prisma {
     id?: boolean
     bet?: boolean
     status?: boolean
+    creatorSide?: boolean
+    result?: boolean
     winnerId?: boolean
+    resolvedAt?: boolean
     createdAt?: boolean
     creatorId?: boolean
     joinerId?: boolean
@@ -7722,7 +7761,10 @@ export namespace Prisma {
     id?: boolean
     bet?: boolean
     status?: boolean
+    creatorSide?: boolean
+    result?: boolean
     winnerId?: boolean
+    resolvedAt?: boolean
     createdAt?: boolean
     creatorId?: boolean
     joinerId?: boolean
@@ -7734,13 +7776,16 @@ export namespace Prisma {
     id?: boolean
     bet?: boolean
     status?: boolean
+    creatorSide?: boolean
+    result?: boolean
     winnerId?: boolean
+    resolvedAt?: boolean
     createdAt?: boolean
     creatorId?: boolean
     joinerId?: boolean
   }
 
-  export type CoinflipGameOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bet" | "status" | "winnerId" | "createdAt" | "creatorId" | "joinerId", ExtArgs["result"]["coinflipGame"]>
+  export type CoinflipGameOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bet" | "status" | "creatorSide" | "result" | "winnerId" | "resolvedAt" | "createdAt" | "creatorId" | "joinerId", ExtArgs["result"]["coinflipGame"]>
   export type CoinflipGameInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     creator?: boolean | UserDefaultArgs<ExtArgs>
     joiner?: boolean | CoinflipGame$joinerArgs<ExtArgs>
@@ -7766,7 +7811,10 @@ export namespace Prisma {
       id: string
       bet: number
       status: $Enums.CoinflipStatus
+      creatorSide: $Enums.CoinSide
+      result: $Enums.CoinSide | null
       winnerId: string | null
+      resolvedAt: Date | null
       createdAt: Date
       creatorId: string
       joinerId: string | null
@@ -8199,7 +8247,10 @@ export namespace Prisma {
     readonly id: FieldRef<"CoinflipGame", 'String'>
     readonly bet: FieldRef<"CoinflipGame", 'Int'>
     readonly status: FieldRef<"CoinflipGame", 'CoinflipStatus'>
+    readonly creatorSide: FieldRef<"CoinflipGame", 'CoinSide'>
+    readonly result: FieldRef<"CoinflipGame", 'CoinSide'>
     readonly winnerId: FieldRef<"CoinflipGame", 'String'>
+    readonly resolvedAt: FieldRef<"CoinflipGame", 'DateTime'>
     readonly createdAt: FieldRef<"CoinflipGame", 'DateTime'>
     readonly creatorId: FieldRef<"CoinflipGame", 'String'>
     readonly joinerId: FieldRef<"CoinflipGame", 'String'>
@@ -11838,7 +11889,10 @@ export namespace Prisma {
     id: 'id',
     bet: 'bet',
     status: 'status',
+    creatorSide: 'creatorSide',
+    result: 'result',
     winnerId: 'winnerId',
+    resolvedAt: 'resolvedAt',
     createdAt: 'createdAt',
     creatorId: 'creatorId',
     joinerId: 'joinerId'
@@ -11961,6 +12015,20 @@ export namespace Prisma {
    * Reference to a field of type 'CoinflipStatus[]'
    */
   export type ListEnumCoinflipStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoinflipStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'CoinSide'
+   */
+  export type EnumCoinSideFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoinSide'>
+    
+
+
+  /**
+   * Reference to a field of type 'CoinSide[]'
+   */
+  export type ListEnumCoinSideFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoinSide[]'>
     
 
 
@@ -12361,7 +12429,10 @@ export namespace Prisma {
     id?: StringFilter<"CoinflipGame"> | string
     bet?: IntFilter<"CoinflipGame"> | number
     status?: EnumCoinflipStatusFilter<"CoinflipGame"> | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFilter<"CoinflipGame"> | $Enums.CoinSide
+    result?: EnumCoinSideNullableFilter<"CoinflipGame"> | $Enums.CoinSide | null
     winnerId?: StringNullableFilter<"CoinflipGame"> | string | null
+    resolvedAt?: DateTimeNullableFilter<"CoinflipGame"> | Date | string | null
     createdAt?: DateTimeFilter<"CoinflipGame"> | Date | string
     creatorId?: StringFilter<"CoinflipGame"> | string
     joinerId?: StringNullableFilter<"CoinflipGame"> | string | null
@@ -12374,7 +12445,10 @@ export namespace Prisma {
     id?: SortOrder
     bet?: SortOrder
     status?: SortOrder
+    creatorSide?: SortOrder
+    result?: SortOrderInput | SortOrder
     winnerId?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     creatorId?: SortOrder
     joinerId?: SortOrderInput | SortOrder
@@ -12390,7 +12464,10 @@ export namespace Prisma {
     NOT?: CoinflipGameWhereInput | CoinflipGameWhereInput[]
     bet?: IntFilter<"CoinflipGame"> | number
     status?: EnumCoinflipStatusFilter<"CoinflipGame"> | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFilter<"CoinflipGame"> | $Enums.CoinSide
+    result?: EnumCoinSideNullableFilter<"CoinflipGame"> | $Enums.CoinSide | null
     winnerId?: StringNullableFilter<"CoinflipGame"> | string | null
+    resolvedAt?: DateTimeNullableFilter<"CoinflipGame"> | Date | string | null
     createdAt?: DateTimeFilter<"CoinflipGame"> | Date | string
     creatorId?: StringFilter<"CoinflipGame"> | string
     joinerId?: StringNullableFilter<"CoinflipGame"> | string | null
@@ -12403,7 +12480,10 @@ export namespace Prisma {
     id?: SortOrder
     bet?: SortOrder
     status?: SortOrder
+    creatorSide?: SortOrder
+    result?: SortOrderInput | SortOrder
     winnerId?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     creatorId?: SortOrder
     joinerId?: SortOrderInput | SortOrder
@@ -12421,7 +12501,10 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"CoinflipGame"> | string
     bet?: IntWithAggregatesFilter<"CoinflipGame"> | number
     status?: EnumCoinflipStatusWithAggregatesFilter<"CoinflipGame"> | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideWithAggregatesFilter<"CoinflipGame"> | $Enums.CoinSide
+    result?: EnumCoinSideNullableWithAggregatesFilter<"CoinflipGame"> | $Enums.CoinSide | null
     winnerId?: StringNullableWithAggregatesFilter<"CoinflipGame"> | string | null
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"CoinflipGame"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"CoinflipGame"> | Date | string
     creatorId?: StringWithAggregatesFilter<"CoinflipGame"> | string
     joinerId?: StringNullableWithAggregatesFilter<"CoinflipGame"> | string | null
@@ -12977,7 +13060,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     creator: UserCreateNestedOneWithoutCoinflipsCreatedInput
     joiner?: UserCreateNestedOneWithoutCoinflipsJoinedInput
@@ -12988,7 +13074,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     creatorId: string
     joinerId?: string | null
@@ -12999,7 +13088,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creator?: UserUpdateOneRequiredWithoutCoinflipsCreatedNestedInput
     joiner?: UserUpdateOneWithoutCoinflipsJoinedNestedInput
@@ -13010,7 +13102,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creatorId?: StringFieldUpdateOperationsInput | string
     joinerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13021,7 +13116,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     creatorId: string
     joinerId?: string | null
@@ -13031,7 +13129,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -13039,7 +13140,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creatorId?: StringFieldUpdateOperationsInput | string
     joinerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13653,6 +13757,20 @@ export namespace Prisma {
     not?: NestedEnumCoinflipStatusFilter<$PrismaModel> | $Enums.CoinflipStatus
   }
 
+  export type EnumCoinSideFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinSide | EnumCoinSideFieldRefInput<$PrismaModel>
+    in?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel>
+    not?: NestedEnumCoinSideFilter<$PrismaModel> | $Enums.CoinSide
+  }
+
+  export type EnumCoinSideNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinSide | EnumCoinSideFieldRefInput<$PrismaModel> | null
+    in?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumCoinSideNullableFilter<$PrismaModel> | $Enums.CoinSide | null
+  }
+
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
     isNot?: UserWhereInput | null
@@ -13667,7 +13785,10 @@ export namespace Prisma {
     id?: SortOrder
     bet?: SortOrder
     status?: SortOrder
+    creatorSide?: SortOrder
+    result?: SortOrder
     winnerId?: SortOrder
+    resolvedAt?: SortOrder
     createdAt?: SortOrder
     creatorId?: SortOrder
     joinerId?: SortOrder
@@ -13681,7 +13802,10 @@ export namespace Prisma {
     id?: SortOrder
     bet?: SortOrder
     status?: SortOrder
+    creatorSide?: SortOrder
+    result?: SortOrder
     winnerId?: SortOrder
+    resolvedAt?: SortOrder
     createdAt?: SortOrder
     creatorId?: SortOrder
     joinerId?: SortOrder
@@ -13691,7 +13815,10 @@ export namespace Prisma {
     id?: SortOrder
     bet?: SortOrder
     status?: SortOrder
+    creatorSide?: SortOrder
+    result?: SortOrder
     winnerId?: SortOrder
+    resolvedAt?: SortOrder
     createdAt?: SortOrder
     creatorId?: SortOrder
     joinerId?: SortOrder
@@ -13709,6 +13836,26 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumCoinflipStatusFilter<$PrismaModel>
     _max?: NestedEnumCoinflipStatusFilter<$PrismaModel>
+  }
+
+  export type EnumCoinSideWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinSide | EnumCoinSideFieldRefInput<$PrismaModel>
+    in?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel>
+    not?: NestedEnumCoinSideWithAggregatesFilter<$PrismaModel> | $Enums.CoinSide
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCoinSideFilter<$PrismaModel>
+    _max?: NestedEnumCoinSideFilter<$PrismaModel>
+  }
+
+  export type EnumCoinSideNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinSide | EnumCoinSideFieldRefInput<$PrismaModel> | null
+    in?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumCoinSideNullableWithAggregatesFilter<$PrismaModel> | $Enums.CoinSide | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumCoinSideNullableFilter<$PrismaModel>
+    _max?: NestedEnumCoinSideNullableFilter<$PrismaModel>
   }
 
   export type NoteCountOrderByAggregateInput = {
@@ -14266,6 +14413,14 @@ export namespace Prisma {
     set?: $Enums.CoinflipStatus
   }
 
+  export type EnumCoinSideFieldUpdateOperationsInput = {
+    set?: $Enums.CoinSide
+  }
+
+  export type NullableEnumCoinSideFieldUpdateOperationsInput = {
+    set?: $Enums.CoinSide | null
+  }
+
   export type UserUpdateOneRequiredWithoutCoinflipsCreatedNestedInput = {
     create?: XOR<UserCreateWithoutCoinflipsCreatedInput, UserUncheckedCreateWithoutCoinflipsCreatedInput>
     connectOrCreate?: UserCreateOrConnectWithoutCoinflipsCreatedInput
@@ -14531,6 +14686,20 @@ export namespace Prisma {
     not?: NestedEnumCoinflipStatusFilter<$PrismaModel> | $Enums.CoinflipStatus
   }
 
+  export type NestedEnumCoinSideFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinSide | EnumCoinSideFieldRefInput<$PrismaModel>
+    in?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel>
+    not?: NestedEnumCoinSideFilter<$PrismaModel> | $Enums.CoinSide
+  }
+
+  export type NestedEnumCoinSideNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinSide | EnumCoinSideFieldRefInput<$PrismaModel> | null
+    in?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumCoinSideNullableFilter<$PrismaModel> | $Enums.CoinSide | null
+  }
+
   export type NestedEnumCoinflipStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.CoinflipStatus | EnumCoinflipStatusFieldRefInput<$PrismaModel>
     in?: $Enums.CoinflipStatus[] | ListEnumCoinflipStatusFieldRefInput<$PrismaModel>
@@ -14539,6 +14708,26 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumCoinflipStatusFilter<$PrismaModel>
     _max?: NestedEnumCoinflipStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCoinSideWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinSide | EnumCoinSideFieldRefInput<$PrismaModel>
+    in?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel>
+    not?: NestedEnumCoinSideWithAggregatesFilter<$PrismaModel> | $Enums.CoinSide
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCoinSideFilter<$PrismaModel>
+    _max?: NestedEnumCoinSideFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCoinSideNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CoinSide | EnumCoinSideFieldRefInput<$PrismaModel> | null
+    in?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.CoinSide[] | ListEnumCoinSideFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumCoinSideNullableWithAggregatesFilter<$PrismaModel> | $Enums.CoinSide | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumCoinSideNullableFilter<$PrismaModel>
+    _max?: NestedEnumCoinSideNullableFilter<$PrismaModel>
   }
 
   export type NestedBoolFilter<$PrismaModel = never> = {
@@ -14985,7 +15174,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     joiner?: UserCreateNestedOneWithoutCoinflipsJoinedInput
     message?: MessageCreateNestedOneWithoutCoinflipGameInput
@@ -14995,7 +15187,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     joinerId?: string | null
     message?: MessageUncheckedCreateNestedOneWithoutCoinflipGameInput
@@ -15015,7 +15210,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     creator: UserCreateNestedOneWithoutCoinflipsCreatedInput
     message?: MessageCreateNestedOneWithoutCoinflipGameInput
@@ -15025,7 +15223,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     creatorId: string
     message?: MessageUncheckedCreateNestedOneWithoutCoinflipGameInput
@@ -15236,7 +15437,10 @@ export namespace Prisma {
     id?: StringFilter<"CoinflipGame"> | string
     bet?: IntFilter<"CoinflipGame"> | number
     status?: EnumCoinflipStatusFilter<"CoinflipGame"> | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFilter<"CoinflipGame"> | $Enums.CoinSide
+    result?: EnumCoinSideNullableFilter<"CoinflipGame"> | $Enums.CoinSide | null
     winnerId?: StringNullableFilter<"CoinflipGame"> | string | null
+    resolvedAt?: DateTimeNullableFilter<"CoinflipGame"> | Date | string | null
     createdAt?: DateTimeFilter<"CoinflipGame"> | Date | string
     creatorId?: StringFilter<"CoinflipGame"> | string
     joinerId?: StringNullableFilter<"CoinflipGame"> | string | null
@@ -15303,7 +15507,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     creator: UserCreateNestedOneWithoutCoinflipsCreatedInput
     joiner?: UserCreateNestedOneWithoutCoinflipsJoinedInput
@@ -15313,7 +15520,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     creatorId: string
     joinerId?: string | null
@@ -15386,7 +15596,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creator?: UserUpdateOneRequiredWithoutCoinflipsCreatedNestedInput
     joiner?: UserUpdateOneWithoutCoinflipsJoinedNestedInput
@@ -15396,7 +15609,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creatorId?: StringFieldUpdateOperationsInput | string
     joinerId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15862,7 +16078,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     joinerId?: string | null
   }
@@ -15871,7 +16090,10 @@ export namespace Prisma {
     id?: string
     bet: number
     status?: $Enums.CoinflipStatus
+    creatorSide?: $Enums.CoinSide
+    result?: $Enums.CoinSide | null
     winnerId?: string | null
+    resolvedAt?: Date | string | null
     createdAt?: Date | string
     creatorId: string
   }
@@ -16035,7 +16257,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     joiner?: UserUpdateOneWithoutCoinflipsJoinedNestedInput
     message?: MessageUpdateOneWithoutCoinflipGameNestedInput
@@ -16045,7 +16270,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     joinerId?: NullableStringFieldUpdateOperationsInput | string | null
     message?: MessageUncheckedUpdateOneWithoutCoinflipGameNestedInput
@@ -16055,7 +16283,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     joinerId?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -16064,7 +16295,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creator?: UserUpdateOneRequiredWithoutCoinflipsCreatedNestedInput
     message?: MessageUpdateOneWithoutCoinflipGameNestedInput
@@ -16074,7 +16308,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creatorId?: StringFieldUpdateOperationsInput | string
     message?: MessageUncheckedUpdateOneWithoutCoinflipGameNestedInput
@@ -16084,7 +16321,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     bet?: IntFieldUpdateOperationsInput | number
     status?: EnumCoinflipStatusFieldUpdateOperationsInput | $Enums.CoinflipStatus
+    creatorSide?: EnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide
+    result?: NullableEnumCoinSideFieldUpdateOperationsInput | $Enums.CoinSide | null
     winnerId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     creatorId?: StringFieldUpdateOperationsInput | string
   }

@@ -177,7 +177,10 @@ exports.Prisma.CoinflipGameScalarFieldEnum = {
   id: 'id',
   bet: 'bet',
   status: 'status',
+  creatorSide: 'creatorSide',
+  result: 'result',
   winnerId: 'winnerId',
+  resolvedAt: 'resolvedAt',
   createdAt: 'createdAt',
   creatorId: 'creatorId',
   joinerId: 'joinerId'
@@ -224,6 +227,11 @@ exports.CoinflipStatus = exports.$Enums.CoinflipStatus = {
   WAITING: 'WAITING',
   FINISHED: 'FINISHED',
   CANCELLED: 'CANCELLED'
+};
+
+exports.CoinSide = exports.$Enums.CoinSide = {
+  HEADS: 'HEADS',
+  TAILS: 'TAILS'
 };
 
 exports.Prisma.ModelName = {

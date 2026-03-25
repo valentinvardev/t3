@@ -4,7 +4,10 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const coinflipRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(z.object({ bet: z.number().int().min(10).max(10000) }))
+    .input(z.object({
+      bet: z.number().int().min(10).max(10000),
+      creatorSide: z.enum(["HEADS", "TAILS"]),
+    }))
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUniqueOrThrow({
         where: { id: ctx.session.user.id },
@@ -19,7 +22,7 @@ export const coinflipRouter = createTRPCRouter({
           data: { points: { decrement: input.bet } },
         });
         const game = await tx.coinflipGame.create({
-          data: { bet: input.bet, creatorId: ctx.session.user.id },
+          data: { bet: input.bet, creatorId: ctx.session.user.id, creatorSide: input.creatorSide },
         });
         await tx.message.create({
           data: { content: "", userId: ctx.session.user.id, coinflipGameId: game.id },
@@ -47,7 +50,9 @@ export const coinflipRouter = createTRPCRouter({
       if (user.points < game.bet) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough points" });
       }
-      const winnerId = Math.random() < 0.5 ? game.creatorId : ctx.session.user.id;
+      const result = Math.random() < 0.5 ? ("HEADS" as const) : ("TAILS" as const);
+      const winnerId = result === game.creatorSide ? game.creatorId : ctx.session.user.id;
+      const resolvedAt = new Date();
       return ctx.db.$transaction(async (tx) => {
         await tx.user.update({
           where: { id: ctx.session.user.id },
@@ -59,7 +64,7 @@ export const coinflipRouter = createTRPCRouter({
         });
         return tx.coinflipGame.update({
           where: { id: input.gameId },
-          data: { joinerId: ctx.session.user.id, winnerId, status: "FINISHED" },
+          data: { joinerId: ctx.session.user.id, winnerId, status: "FINISHED", result, resolvedAt },
           include: {
             creator: { select: { id: true, name: true } },
             joiner: { select: { id: true, name: true } },

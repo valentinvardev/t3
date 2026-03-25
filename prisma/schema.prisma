@@ -93,12 +93,20 @@ enum CoinflipStatus {
     CANCELLED
 }
 
+enum CoinSide {
+    HEADS
+    TAILS
+}
+
 model CoinflipGame {
-    id        String         @id @default(cuid())
-    bet       Int
-    status    CoinflipStatus @default(WAITING)
-    winnerId  String?
-    createdAt DateTime       @default(now())
+    id          String         @id @default(cuid())
+    bet         Int
+    status      CoinflipStatus @default(WAITING)
+    creatorSide CoinSide       @default(HEADS)
+    result      CoinSide?
+    winnerId    String?
+    resolvedAt  DateTime?
+    createdAt   DateTime       @default(now())
 
     creatorId String
     creator   User   @relation("CoinflipCreator", fields: [creatorId], references: [id], onDelete: Cascade)
