@@ -85,6 +85,7 @@ model Message {
     coinflipGame   CoinflipGame? @relation(fields: [coinflipGameId], references: [id])
 
     @@index([createdAt])
+    @@index([userId, createdAt])
 }
 
 enum CoinflipStatus {
@@ -115,6 +116,8 @@ model CoinflipGame {
     joiner   User?   @relation("CoinflipJoiner", fields: [joinerId], references: [id])
 
     message Message?
+
+    @@index([creatorId, createdAt])
 }
 
 model Note {

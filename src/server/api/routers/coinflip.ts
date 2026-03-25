@@ -9,18 +9,25 @@ export const coinflipRouter = createTRPCRouter({
       creatorSide: z.enum(["HEADS", "TAILS"]),
     }))
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUniqueOrThrow({
-        where: { id: ctx.session.user.id },
-        select: { points: true },
+      // Rate limit: 1 game created per 10 seconds
+      const tenSecondsAgo = new Date(Date.now() - 10_000);
+      const recentGame = await ctx.db.coinflipGame.findFirst({
+        where: { creatorId: ctx.session.user.id, createdAt: { gte: tenSecondsAgo } },
+        select: { id: true },
       });
-      if (user.points < input.bet) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough points" });
+      if (recentGame) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Wait before creating another game" });
       }
+
       return ctx.db.$transaction(async (tx) => {
-        await tx.user.update({
-          where: { id: ctx.session.user.id },
+        // Atomically deduct points only if balance is sufficient — fixes TOCTOU race
+        const deducted = await tx.user.updateMany({
+          where: { id: ctx.session.user.id, points: { gte: input.bet } },
           data: { points: { decrement: input.bet } },
         });
+        if (deducted.count === 0) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough points" });
+        }
         const game = await tx.coinflipGame.create({
           data: { bet: input.bet, creatorId: ctx.session.user.id, creatorSide: input.creatorSide },
         });
@@ -34,6 +41,7 @@ export const coinflipRouter = createTRPCRouter({
   join: protectedProcedure
     .input(z.object({ gameId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      // Pre-flight checks (cheap; race-condition-safe version happens inside tx)
       const game = await ctx.db.coinflipGame.findUniqueOrThrow({
         where: { id: input.gameId },
       });
@@ -43,28 +51,34 @@ export const coinflipRouter = createTRPCRouter({
       if (game.creatorId === ctx.session.user.id) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot join your own game" });
       }
-      const user = await ctx.db.user.findUniqueOrThrow({
-        where: { id: ctx.session.user.id },
-        select: { points: true },
-      });
-      if (user.points < game.bet) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough points" });
-      }
+
       const result = Math.random() < 0.5 ? ("HEADS" as const) : ("TAILS" as const);
       const winnerId = result === game.creatorSide ? game.creatorId : ctx.session.user.id;
       const resolvedAt = new Date();
+
       return ctx.db.$transaction(async (tx) => {
-        await tx.user.update({
-          where: { id: ctx.session.user.id },
+        // Atomically deduct joiner's points — fixes TOCTOU race
+        const deducted = await tx.user.updateMany({
+          where: { id: ctx.session.user.id, points: { gte: game.bet } },
           data: { points: { decrement: game.bet } },
         });
+        if (deducted.count === 0) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough points" });
+        }
+        // Atomically claim the game — prevents double-join under concurrent requests
+        const claimed = await tx.coinflipGame.updateMany({
+          where: { id: input.gameId, status: "WAITING" },
+          data: { joinerId: ctx.session.user.id, status: "FINISHED", result, winnerId, resolvedAt },
+        });
+        if (claimed.count === 0) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Game is no longer open" });
+        }
         await tx.user.update({
           where: { id: winnerId },
           data: { points: { increment: game.bet * 2 } },
         });
-        return tx.coinflipGame.update({
+        return tx.coinflipGame.findUniqueOrThrow({
           where: { id: input.gameId },
-          data: { joinerId: ctx.session.user.id, winnerId, status: "FINISHED", result, resolvedAt },
           include: {
             creator: { select: { id: true, name: true } },
             joiner: { select: { id: true, name: true } },

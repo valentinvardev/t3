@@ -419,18 +419,45 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  /**
-   * Poll at 1.5 s so the creator (who didn't cause the invalidation) sees
-   * resolvedAt within 1.5 s of the joiner, instead of up to 3 s.
-   */
-  const { data: messages = [], isLoading } = api.messages.getRecent.useQuery(undefined, {
-    refetchInterval: 1_500,
-  });
+  // ── Message state (incremental polling) ──────────────────────────────────────
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  /** Tracks the createdAt of the latest known message for incremental fetches. */
+  const sinceRef = useRef<Date | undefined>(undefined);
+
+  // Initial load: fetch last 50 messages once on mount
+  useEffect(() => {
+    void utilsRef.current.messages.getRecent.fetch({}).then((msgs) => {
+      setMessages(msgs);
+      if (msgs.length > 0) sinceRef.current = new Date(msgs[msgs.length - 1]!.createdAt);
+      setIsLoading(false);
+    });
+  // utilsRef is a ref — safe to omit from deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Incremental poll: only fetches messages newer than the last known one
+  useEffect(() => {
+    const id = setInterval(async () => {
+      try {
+        const incoming = await utilsRef.current.messages.getRecent.fetch({ since: sinceRef.current });
+        if (incoming.length > 0) {
+          setMessages((prev) => [...prev, ...incoming].slice(-250));
+          sinceRef.current = new Date(incoming[incoming.length - 1]!.createdAt);
+        }
+      } catch {
+        // ignore transient poll errors
+      }
+    }, 1_500);
+    return () => clearInterval(id);
+  // utilsRef is a ref — safe to omit from deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const { data: users = [] } = api.users.getAll.useQuery(undefined, { refetchInterval: 15_000 });
-  // Pause me-polling while an animation is active so the balance doesn't jump
-  // mid-flip. triggerAnim invalidates me after the animation finishes instead.
+  // Pause me-polling while an animation is active so the balance doesn't update mid-flip.
+  // triggerAnim invalidates me after the animation finishes instead.
   const hasActiveAnim = gamePhases.size > 0;
-  const { data: me }  = api.users.me.useQuery(undefined, {
+  const { data: me } = api.users.me.useQuery(undefined, {
     refetchInterval: hasActiveAnim ? false : 10_000,
   });
 
@@ -494,43 +521,49 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
   }, [messages, triggerAnim]);
 
   const send = api.messages.send.useMutation({
-    onSuccess: () => utils.messages.getRecent.invalidate(),
+    onSuccess: (msg) => {
+      setMessages((prev) => [...prev, { ...msg, coinflipGame: null } as Message]);
+      sinceRef.current = new Date(msg.createdAt);
+    },
   });
 
   const createGame = api.coinflip.create.useMutation({
     onSuccess: () => {
-      utils.messages.getRecent.invalidate();
-      utils.users.me.invalidate();
+      // Fetch the newly-created coinflip message immediately rather than waiting for next poll
+      void utilsRef.current.messages.getRecent.fetch({ since: sinceRef.current }).then((incoming) => {
+        if (incoming.length > 0) {
+          setMessages((prev) => [...prev, ...incoming].slice(-250));
+          sinceRef.current = new Date(incoming[incoming.length - 1]!.createdAt);
+        }
+      });
+      void utils.users.me.invalidate();
       setBetStep(null);
     },
   });
 
   const joinGame = api.coinflip.join.useMutation({
     onSuccess: (game) => {
-      // Immediately write the FINISHED game into the messages cache.
-      // This ensures landing/result phases always see game.result / game.winnerId
-      // without waiting for the background refetch to complete.
-      utils.messages.getRecent.setData(undefined, (old) => {
-        if (!old) return old;
-        return old.map((msg) =>
-          msg.coinflipGame?.id === game.id
-            ? { ...msg, coinflipGame: game as typeof msg.coinflipGame }
-            : msg,
-        );
-      });
-      // Trigger animation for joiner immediately; creator/spectators catch it via poll
+      // Immediately update the message in local state so the animation phases
+      // always see the FINISHED game data (result, winnerId) without waiting for poll.
+      setMessages((prev) => prev.map((msg) =>
+        msg.coinflipGame?.id === game.id
+          ? { ...msg, coinflipGame: game as typeof msg.coinflipGame }
+          : msg,
+      ));
+      // Trigger animation for joiner; creator/spectators catch it via the poll
       triggerAnim(game.id);
-      // Still invalidate so a real refetch confirms the state
-      utils.messages.getRecent.invalidate();
-      // me.invalidate() is intentionally deferred to inside triggerAnim so the
-      // balance doesn't update before the animation reveals the result.
+      // me.invalidate() is deferred inside triggerAnim so balance only updates after animation.
     },
   });
 
   const cancelGame = api.coinflip.cancel.useMutation({
-    onSuccess: () => {
-      utils.messages.getRecent.invalidate();
-      utils.users.me.invalidate();
+    onSuccess: (game) => {
+      setMessages((prev) => prev.map((msg) =>
+        msg.coinflipGame?.id === game.id
+          ? { ...msg, coinflipGame: { ...msg.coinflipGame!, status: "CANCELLED" as const } }
+          : msg,
+      ));
+      void utils.users.me.invalidate();
     },
   });
 
