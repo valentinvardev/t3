@@ -30,11 +30,24 @@ export const coinflipRouter = createTRPCRouter({
         }
         const game = await tx.coinflipGame.create({
           data: { bet: input.bet, creatorId: ctx.session.user.id, creatorSide: input.creatorSide },
+          include: {
+            creator: { select: { id: true, name: true } },
+            joiner:  { select: { id: true, name: true } },
+          },
         });
-        await tx.message.create({
+        const message = await tx.message.create({
           data: { content: "", userId: ctx.session.user.id, coinflipGameId: game.id },
+          include: {
+            user: { select: { id: true, name: true } },
+            coinflipGame: {
+              include: {
+                creator: { select: { id: true, name: true } },
+                joiner:  { select: { id: true, name: true } },
+              },
+            },
+          },
         });
-        return game;
+        return { game, message };
       });
     }),
 

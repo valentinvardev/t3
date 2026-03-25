@@ -528,14 +528,10 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
   });
 
   const createGame = api.coinflip.create.useMutation({
-    onSuccess: () => {
-      // Fetch the newly-created coinflip message immediately rather than waiting for next poll
-      void utilsRef.current.messages.getRecent.fetch({ since: sinceRef.current }).then((incoming) => {
-        if (incoming.length > 0) {
-          setMessages((prev) => [...prev, ...incoming].slice(-250));
-          sinceRef.current = new Date(incoming[incoming.length - 1]!.createdAt);
-        }
-      });
+    onSuccess: ({ message }) => {
+      // Server returns the full message+coinflipGame — add it directly, no extra fetch needed
+      setMessages((prev) => [...prev, message as Message]);
+      sinceRef.current = new Date(message.createdAt);
       void utils.users.me.invalidate();
       setBetStep(null);
     },
