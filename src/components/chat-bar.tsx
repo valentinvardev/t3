@@ -177,7 +177,25 @@ function CoinflipCard({ game, currentUserId, phase, onJoin, onCancel, joinPendin
   }
 
   // ── LANDING — show the result coin big for LANDING_MS before full result ──
-  if (phase === "landing" && resultSide) {
+  if (phase === "landing") {
+    // resultSide should always be set here (messages updated well before FLIP_MS elapsed)
+    // but if for any reason it isn't yet, fall back to the spinning card rather than
+    // accidentally rendering the WAITING state.
+    if (!resultSide) {
+      // fallback: stay in spinning state until result arrives
+      return (
+        <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+          <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-2">
+            <div className="flex items-center gap-1.5">
+              <Coins size={11} className="text-zinc-600" />
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Coinflip · Deciding…</span>
+            </div>
+            <span className="text-[10px] font-bold text-amber-400">{game.bet * 2} pts</span>
+          </div>
+          <div className="flex justify-center py-6"><CoinSpinning size={54} /></div>
+        </div>
+      );
+    }
     return (
       <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
         <div className="flex flex-col items-center gap-2 py-6 px-4">
@@ -461,8 +479,20 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
 
   const joinGame = api.coinflip.join.useMutation({
     onSuccess: (game) => {
-      // Joiner triggers immediately; others catch it via the poll effect above
+      // Immediately write the FINISHED game into the messages cache.
+      // This ensures landing/result phases always see game.result / game.winnerId
+      // without waiting for the background refetch to complete.
+      utils.messages.getRecent.setData(undefined, (old) => {
+        if (!old) return old;
+        return old.map((msg) =>
+          msg.coinflipGame?.id === game.id
+            ? { ...msg, coinflipGame: game as typeof msg.coinflipGame }
+            : msg,
+        );
+      });
+      // Trigger animation for joiner immediately; creator/spectators catch it via poll
       triggerAnim(game.id);
+      // Still invalidate so a real refetch confirms the state
       utils.messages.getRecent.invalidate();
       utils.users.me.invalidate();
     },
