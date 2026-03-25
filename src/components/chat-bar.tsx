@@ -9,60 +9,65 @@ import { useSession } from "next-auth/react";
 import { api, type RouterOutputs } from "~/trpc/react";
 
 type Message = RouterOutputs["messages"]["getRecent"][number];
-type User = RouterOutputs["users"]["getAll"][number];
+type User    = RouterOutputs["users"]["getAll"][number];
 type CoinflipGame = NonNullable<Message["coinflipGame"]>;
 type CoinSide = "HEADS" | "TAILS";
+type AnimPhase = "flipping" | "landing";
 
 const ONLINE_THRESHOLD_MS = 60_000;
 const BET_PRESETS = [50, 100, 250, 500, 1000];
-/**
- * How long (ms) the flip animation window stays open.
- * Must be > polling interval (3 000 ms) so the creator's next poll still
- * sees the window open and triggers the animation.
- */
-const FLIP_WINDOW_MS = 5_500;
 
-// ── Coin side config ─────────────────────────────────────────────────────────
+/**
+ * Flip animation duration. Keep this long so that even a user who polls up to
+ * 1.5 s late still sees most of the spinning before the coin lands.
+ */
+const FLIP_MS    = 4_500;
+/** How long the landed coin is shown before the full result card appears. */
+const LANDING_MS = 2_500;
+/**
+ * Total window from resolvedAt during which a new viewer can still trigger the
+ * animation. Must be > FLIP_MS + LANDING_MS so late pollers still start.
+ */
+const ANIM_WINDOW_MS = FLIP_MS + LANDING_MS + 1_500;
+
+// ── Coin config ───────────────────────────────────────────────────────────────
 
 const SIDES = {
   HEADS: {
     label: "Heads",
-    letter: "H",
     Icon: Crown,
     bg: "linear-gradient(145deg, #78350f 0%, #92400e 50%, #451a03 100%)",
     border: "#f59e0b",
     glow: "rgba(245,158,11,0.7)",
+    dimGlow: "rgba(245,158,11,0.25)",
     iconClass: "text-amber-300",
-    pillClass: "bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/25",
-    activePillClass: "bg-amber-500/30 text-amber-300 border-amber-400",
+    pillClass: "border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20",
   },
   TAILS: {
     label: "Tails",
-    letter: "T",
     Icon: Zap,
     bg: "linear-gradient(145deg, #312e81 0%, #3730a3 50%, #1e1b4b 100%)",
     border: "#6366f1",
     glow: "rgba(99,102,241,0.7)",
+    dimGlow: "rgba(99,102,241,0.25)",
     iconClass: "text-indigo-300",
-    pillClass: "bg-indigo-500/15 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/25",
-    activePillClass: "bg-indigo-500/30 text-indigo-300 border-indigo-400",
+    pillClass: "border-indigo-500/30 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20",
   },
 } as const;
 
-// ── Coin visuals ─────────────────────────────────────────────────────────────
+// ── Coin components ───────────────────────────────────────────────────────────
 
-function CoinFaceStatic({ side, size = 44 }: { side: CoinSide; size?: number }) {
+function CoinFace({ side, size = 44 }: { side: CoinSide; size?: number }) {
   const s = SIDES[side];
   const Icon = s.Icon;
   return (
     <div
       className="flex shrink-0 items-center justify-center rounded-full"
       style={{
-        width: size,
-        height: size,
+        width: size, height: size,
         background: s.bg,
-        border: `${size >= 44 ? 3 : 2}px solid ${s.border}`,
-        boxShadow: `0 2px 12px ${s.glow.replace("0.7", "0.3")}`,
+        border: `${size >= 44 ? "3px" : "2px"} solid ${s.border}`,
+        boxShadow: `0 2px 12px ${s.dimGlow}`,
       }}
     >
       <Icon size={Math.round(size * 0.38)} className={s.iconClass} strokeWidth={2.5} />
@@ -70,57 +75,48 @@ function CoinFaceStatic({ side, size = 44 }: { side: CoinSide; size?: number }) 
   );
 }
 
-/** Two-faced spinning coin: HEADS and TAILS alternate each half-rotation. */
+/** Two-faced coin: HEADS and TAILS swap at the exact moment the coin is edge-on. */
 function CoinSpinning({ size = 56 }: { size?: number }) {
   const hs = SIDES.HEADS;
   const ts = SIDES.TAILS;
-  const iconSize = Math.round(size * 0.38);
-  const border = `3px solid`;
+  const iSize = Math.round(size * 0.38);
   return (
     <div className="coin-spinning relative shrink-0" style={{ width: size, height: size }}>
-      {/* HEADS face */}
       <div
         className="coin-face-front absolute inset-0 flex items-center justify-center rounded-full"
-        style={{ background: hs.bg, border: `${border} ${hs.border}`, boxShadow: `0 0 22px ${hs.glow}` }}
+        style={{ background: hs.bg, border: `3px solid ${hs.border}`, boxShadow: `0 0 22px ${hs.glow}` }}
       >
-        <Crown size={iconSize} className={hs.iconClass} strokeWidth={2.5} />
+        <Crown size={iSize} className={hs.iconClass} strokeWidth={2.5} />
       </div>
-      {/* TAILS face */}
       <div
         className="coin-face-back absolute inset-0 flex items-center justify-center rounded-full"
-        style={{ background: ts.bg, border: `${border} ${ts.border}`, boxShadow: `0 0 22px ${ts.glow}` }}
+        style={{ background: ts.bg, border: `3px solid ${ts.border}`, boxShadow: `0 0 22px ${ts.glow}` }}
       >
-        <Zap size={iconSize} className={ts.iconClass} strokeWidth={2.5} />
+        <Zap size={iSize} className={ts.iconClass} strokeWidth={2.5} />
       </div>
     </div>
   );
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-function isOnline(user: User) {
-  if (!user.lastSeen) return false;
-  return Date.now() - new Date(user.lastSeen).getTime() < ONLINE_THRESHOLD_MS;
+function isOnline(u: User) {
+  if (!u.lastSeen) return false;
+  return Date.now() - new Date(u.lastSeen).getTime() < ONLINE_THRESHOLD_MS;
 }
-
 function avatar(name: string | null | undefined) {
   return (name ?? "?")[0]?.toUpperCase() ?? "?";
 }
-
 const AVATAR_COLORS = [
   "bg-violet-500", "bg-indigo-500", "bg-blue-500", "bg-cyan-500",
   "bg-teal-500", "bg-emerald-500", "bg-rose-500", "bg-orange-500",
 ];
-
 function avatarColor(id: string) {
-  const code = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
-  return AVATAR_COLORS[code % AVATAR_COLORS.length]!;
+  const c = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
+  return AVATAR_COLORS[c % AVATAR_COLORS.length]!;
 }
-
-function formatTime(date: Date) {
-  return new Date(date).toLocaleTimeString("en-US", {
-    hour: "2-digit", minute: "2-digit", hour12: false,
-  });
+function formatTime(d: Date) {
+  return new Date(d).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
 // ── Coinflip Card ─────────────────────────────────────────────────────────────
@@ -128,29 +124,29 @@ function formatTime(date: Date) {
 interface CoinflipCardProps {
   game: CoinflipGame;
   currentUserId: string;
-  isFlipping: boolean;
-  onJoin: (gameId: string) => void;
-  onCancel: (gameId: string) => void;
+  phase: AnimPhase | undefined; // undefined = show result
+  onJoin: (id: string) => void;
+  onCancel: (id: string) => void;
   joinPending: boolean;
   cancelPending: boolean;
 }
 
-function CoinflipCard({ game, currentUserId, isFlipping, onJoin, onCancel, joinPending, cancelPending }: CoinflipCardProps) {
-  const isCreator = game.creatorId === currentUserId;
-  const isJoiner = game.joinerId === currentUserId;
-  const isParticipant = isCreator || isJoiner;
-  const iWon = isParticipant && game.winnerId === currentUserId;
+function CoinflipCard({ game, currentUserId, phase, onJoin, onCancel, joinPending, cancelPending }: CoinflipCardProps) {
+  const isCreator    = game.creatorId === currentUserId;
+  const isParticipant = isCreator || game.joinerId === currentUserId;
+  const iWon  = isParticipant && game.winnerId === currentUserId;
   const iLost = isParticipant && !!game.winnerId && !iWon;
   const joinerSide: CoinSide = game.creatorSide === "HEADS" ? "TAILS" : "HEADS";
   const winner = game.winnerId === game.creatorId ? game.creator : game.joiner;
+  const resultSide = game.result as CoinSide | null;
 
-  // ── FLIPPING (shown to all users while resolvedAt is within FLIP_WINDOW_MS) ──
-  if (isFlipping) {
+  // ── FLIPPING ──
+  if (phase === "flipping") {
     return (
-      <div className="overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-900">
+      <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
         <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-2">
           <div className="flex items-center gap-1.5">
-            <Coins size={11} className="text-zinc-500" />
+            <Coins size={11} className="text-zinc-600" />
             <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
               Coinflip · Deciding…
             </span>
@@ -158,33 +154,47 @@ function CoinflipCard({ game, currentUserId, isFlipping, onJoin, onCancel, joinP
           <span className="text-[10px] font-bold text-amber-400">{game.bet * 2} pts</span>
         </div>
         <div className="flex items-center justify-between px-4 py-4">
-          {/* Creator */}
           <div className="flex flex-col items-center gap-2">
             <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${avatarColor(game.creatorId)}`}>
               {avatar(game.creator.name)}
             </div>
-            <CoinFaceStatic side={game.creatorSide} size={36} />
-            <span className="max-w-[60px] truncate text-[10px] font-medium text-zinc-400">
-              {game.creator.name ?? "Unknown"}
-            </span>
+            <CoinFace side={game.creatorSide} size={34} />
+            <span className="max-w-[60px] truncate text-[10px] text-zinc-500">{game.creator.name ?? "Unknown"}</span>
           </div>
 
-          {/* Spinning coin (center) */}
-          <div className="flex flex-col items-center gap-1.5">
-            <CoinSpinning size={52} />
-            <span className="text-xs font-semibold text-zinc-500">vs</span>
-          </div>
+          <CoinSpinning size={54} />
 
-          {/* Joiner */}
           <div className="flex flex-col items-center gap-2">
             <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${game.joinerId ? avatarColor(game.joinerId) : "bg-zinc-700"}`}>
               {avatar(game.joiner?.name)}
             </div>
-            <CoinFaceStatic side={joinerSide} size={36} />
-            <span className="max-w-[60px] truncate text-[10px] font-medium text-zinc-400">
-              {game.joiner?.name ?? "Unknown"}
-            </span>
+            <CoinFace side={joinerSide} size={34} />
+            <span className="max-w-[60px] truncate text-[10px] text-zinc-500">{game.joiner?.name ?? "Unknown"}</span>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── LANDING — show the result coin big for LANDING_MS before full result ──
+  if (phase === "landing" && resultSide) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+        <div className="flex flex-col items-center gap-2 py-6 px-4">
+          <div className="animate-coin-land">
+            <CoinFace side={resultSide} size={72} />
+          </div>
+          <p className={`text-2xl font-black ${SIDES[resultSide].iconClass}`}>
+            {SIDES[resultSide].label}!
+          </p>
+          <p className="text-sm font-semibold text-zinc-200">
+            {winner?.name ?? "Unknown"} wins {game.bet * 2} pts
+          </p>
+          {isParticipant && (
+            <p className={`text-xs font-medium ${iWon ? "text-emerald-400" : "text-red-400"}`}>
+              {iWon ? `+${game.bet * 2} pts` : `−${game.bet} pts`}
+            </p>
+          )}
         </div>
       </div>
     );
@@ -196,7 +206,7 @@ function CoinflipCard({ game, currentUserId, isFlipping, onJoin, onCancel, joinP
       <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
         <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-2">
           <div className="flex items-center gap-1.5">
-            <Coins size={11} className="text-amber-500/70" />
+            <Coins size={11} className="text-amber-500/60" />
             <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
               Coinflip · Open
             </span>
@@ -204,53 +214,46 @@ function CoinflipCard({ game, currentUserId, isFlipping, onJoin, onCancel, joinP
           <span className="text-[10px] font-bold text-amber-400">{game.bet} pts each</span>
         </div>
         <div className="flex items-center gap-3 px-3 py-3">
-          {/* Creator's chosen side */}
-          <CoinFaceStatic side={game.creatorSide} size={44} />
+          <CoinFace side={game.creatorSide} size={44} />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-zinc-100">
-              {game.creator.name ?? "Unknown"}
-            </p>
+            <p className="truncate text-sm font-semibold text-zinc-100">{game.creator.name ?? "Unknown"}</p>
             <p className="text-xs text-zinc-500">
               picked{" "}
-              <span className={SIDES[game.creatorSide].iconClass + " font-semibold"}>
+              <span className={`font-semibold ${SIDES[game.creatorSide].iconClass}`}>
                 {SIDES[game.creatorSide].label}
               </span>
               <span className="mx-1 text-zinc-700">·</span>
-              prize{" "}
-              <span className="font-semibold text-zinc-300">{game.bet * 2} pts</span>
+              prize <span className="font-semibold text-zinc-300">{game.bet * 2} pts</span>
             </p>
           </div>
-          <div className="shrink-0">
-            {!isCreator ? (
-              <button
-                onClick={() => onJoin(game.id)}
-                disabled={joinPending}
-                className="flex items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-200 transition hover:bg-zinc-700 disabled:opacity-50"
-              >
-                {joinPending ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
-                Join
-              </button>
-            ) : (
-              <button
-                onClick={() => onCancel(game.id)}
-                disabled={cancelPending}
-                className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-500 transition hover:bg-zinc-800 hover:text-zinc-300 disabled:opacity-50"
-              >
-                {cancelPending ? <Loader2 size={11} className="animate-spin" /> : "Cancel"}
-              </button>
-            )}
-          </div>
+          {!isCreator ? (
+            <button
+              onClick={() => onJoin(game.id)}
+              disabled={joinPending}
+              className="flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-200 transition hover:bg-zinc-700 disabled:opacity-50"
+            >
+              {joinPending ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
+              Join
+            </button>
+          ) : (
+            <button
+              onClick={() => onCancel(game.id)}
+              disabled={cancelPending}
+              className="shrink-0 rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-500 transition hover:bg-zinc-800 hover:text-zinc-300 disabled:opacity-50"
+            >
+              {cancelPending ? <Loader2 size={11} className="animate-spin" /> : "Cancel"}
+            </button>
+          )}
         </div>
       </div>
     );
   }
 
-  // ── FINISHED ──
+  // ── FINISHED (full result) ──
   if (game.status === "FINISHED") {
-    const resultSide = game.result as CoinSide | null;
     return (
       <div className={`overflow-hidden rounded-2xl border bg-zinc-900 ${
-        iWon ? "animate-win-glow border-emerald-500/40"
+        iWon  ? "animate-win-glow border-emerald-500/40"
         : iLost ? "animate-lose-shake border-red-500/20"
         : "border-zinc-800"
       }`}>
@@ -262,9 +265,9 @@ function CoinflipCard({ game, currentUserId, isFlipping, onJoin, onCancel, joinP
             </span>
           </div>
           {resultSide && (
-            <div className="flex items-center gap-1">
-              <span className="text-[10px] text-zinc-600">Landed on</span>
-              <CoinFaceStatic side={resultSide} size={18} />
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-zinc-600">Landed</span>
+              <CoinFace side={resultSide} size={18} />
               <span className={`text-[10px] font-bold ${SIDES[resultSide].iconClass}`}>
                 {SIDES[resultSide].label}
               </span>
@@ -272,30 +275,27 @@ function CoinflipCard({ game, currentUserId, isFlipping, onJoin, onCancel, joinP
           )}
         </div>
         <div className="px-3 py-3">
-          {/* Players row */}
           <div className="mb-3 flex items-center justify-between">
             <div className="flex flex-col items-center gap-1.5">
               <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${avatarColor(game.creatorId)}`}>
                 {avatar(game.creator.name)}
               </div>
-              <CoinFaceStatic side={game.creatorSide} size={28} />
+              <CoinFace side={game.creatorSide} size={28} />
               <span className={`max-w-[64px] truncate text-[10px] font-semibold ${
                 game.winnerId === game.creatorId ? SIDES[game.creatorSide].iconClass : "text-zinc-600 line-through"
               }`}>
                 {game.creator.name ?? "Unknown"}
               </span>
             </div>
-
             <div className="text-center">
-              <p className="mb-0.5 text-[10px] font-bold text-zinc-600">vs</p>
+              <p className="text-[10px] font-bold text-zinc-600">vs</p>
               <p className="text-xs font-bold text-zinc-300">{game.bet * 2} pts</p>
             </div>
-
             <div className="flex flex-col items-center gap-1.5">
               <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${game.joinerId ? avatarColor(game.joinerId) : "bg-zinc-700"}`}>
                 {avatar(game.joiner?.name)}
               </div>
-              <CoinFaceStatic side={joinerSide} size={28} />
+              <CoinFace side={joinerSide} size={28} />
               <span className={`max-w-[64px] truncate text-[10px] font-semibold ${
                 game.winnerId === game.joinerId ? SIDES[joinerSide].iconClass : "text-zinc-600 line-through"
               }`}>
@@ -303,18 +303,14 @@ function CoinflipCard({ game, currentUserId, isFlipping, onJoin, onCancel, joinP
               </span>
             </div>
           </div>
-
-          {/* Result banner */}
           <div className={`rounded-lg px-3 py-2 text-center text-xs font-bold ${
-            iWon ? "bg-emerald-500/10 text-emerald-400"
+            iWon  ? "bg-emerald-500/10 text-emerald-400"
             : iLost ? "bg-red-500/10 text-red-400"
             : "bg-zinc-800 text-zinc-400"
           }`}>
-            {iWon
-              ? `You won +${game.bet * 2} pts`
-              : iLost
-                ? `You lost ${game.bet} pts`
-                : `${winner?.name ?? "Unknown"} won ${game.bet * 2} pts`}
+            {iWon  ? `You won +${game.bet * 2} pts`
+            : iLost ? `You lost ${game.bet} pts`
+            : `${winner?.name ?? "Unknown"} won ${game.bet * 2} pts`}
           </div>
         </div>
       </div>
@@ -325,7 +321,7 @@ function CoinflipCard({ game, currentUserId, isFlipping, onJoin, onCancel, joinP
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-800/50 bg-zinc-900/60">
       <div className="flex items-center gap-2 px-3 py-2.5">
-        <CoinFaceStatic side={game.creatorSide} size={24} />
+        <CoinFace side={game.creatorSide} size={24} />
         <p className="text-xs text-zinc-600">
           {game.creator.name ?? "Unknown"} cancelled · {game.bet} pts refunded
         </p>
@@ -334,14 +330,11 @@ function CoinflipCard({ game, currentUserId, isFlipping, onJoin, onCancel, joinP
   );
 }
 
-// ── Users Panel ─────────────────────────────────────────────────────────────
+// ── Users Panel ───────────────────────────────────────────────────────────────
 
 function UsersPanel({ onBack }: { onBack: () => void }) {
-  const { data: users = [], isLoading } = api.users.getAll.useQuery(undefined, {
-    refetchInterval: 15_000,
-  });
+  const { data: users = [], isLoading } = api.users.getAll.useQuery(undefined, { refetchInterval: 15_000 });
   const online = users.filter(isOnline);
-
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 border-b border-zinc-800 px-4 py-3">
@@ -359,23 +352,20 @@ function UsersPanel({ onBack }: { onBack: () => void }) {
           <div className="flex justify-center py-8"><Loader2 size={20} className="animate-spin text-zinc-600" /></div>
         ) : (
           <div className="flex flex-col gap-1">
-            {users.map((u) => {
-              const on = isOnline(u);
-              return (
-                <div key={u.id} className="flex items-center gap-3 rounded-lg px-2 py-2">
-                  <div className="relative">
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${avatarColor(u.id)}`}>
-                      {avatar(u.name)}
-                    </div>
-                    <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-zinc-900 ${on ? "bg-emerald-500" : "bg-zinc-600"}`} />
+            {users.map((u) => (
+              <div key={u.id} className="flex items-center gap-3 rounded-lg px-2 py-2">
+                <div className="relative">
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${avatarColor(u.id)}`}>
+                    {avatar(u.name)}
                   </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-zinc-200">{u.name ?? "Unknown"}</p>
-                    <p className="truncate text-xs text-zinc-600">{u.email}</p>
-                  </div>
+                  <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-zinc-900 ${isOnline(u) ? "bg-emerald-500" : "bg-zinc-600"}`} />
                 </div>
-              );
-            })}
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-zinc-200">{u.name ?? "Unknown"}</p>
+                  <p className="truncate text-xs text-zinc-600">{u.email}</p>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -383,52 +373,67 @@ function UsersPanel({ onBack }: { onBack: () => void }) {
   );
 }
 
-// ── Chat Panel ───────────────────────────────────────────────────────────────
+// ── Chat Panel ────────────────────────────────────────────────────────────────
 
 function ChatPanel({ onClose }: { onClose: () => void }) {
   const { data: session } = useSession();
   const utils = api.useUtils();
-  const [view, setView] = useState<"chat" | "users">("chat");
-  const [input, setInput] = useState("");
-  // Bet selector state: null = hidden, "side" = picking side, "bet" = picking amount
+  const [view, setView]       = useState<"chat" | "users">("chat");
+  const [input, setInput]     = useState("");
   const [betStep, setBetStep] = useState<null | "side" | "bet">(null);
   const [pickedSide, setPickedSide] = useState<CoinSide>("HEADS");
 
   /**
-   * Set of gameIds currently showing the flip animation.
-   * We add a gameId when resolvedAt is detected within FLIP_WINDOW_MS.
-   * We use a ref to prevent double-triggering on re-renders.
+   * Per-game animation phase map.
+   * flipping → landing → (entry deleted = show full result)
    */
-  const [flippingGames, setFlippingGames] = useState<Set<string>>(new Set());
+  const [gamePhases, setGamePhases] = useState<Map<string, AnimPhase>>(new Map());
+  /** Prevent double-triggering the same game across re-renders. */
   const triggeredRef = useRef<Set<string>>(new Set());
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  /**
+   * Poll at 1.5 s so the creator (who didn't cause the invalidation) sees
+   * resolvedAt within 1.5 s of the joiner, instead of up to 3 s.
+   */
   const { data: messages = [], isLoading } = api.messages.getRecent.useQuery(undefined, {
-    refetchInterval: 3_000,
+    refetchInterval: 1_500,
   });
   const { data: users = [] } = api.users.getAll.useQuery(undefined, { refetchInterval: 15_000 });
-  const { data: me } = api.users.me.useQuery(undefined, { refetchInterval: 10_000 });
+  const { data: me }         = api.users.me.useQuery(undefined,    { refetchInterval: 10_000 });
 
   const onlineCount = users.filter(isOnline).length;
 
-  const addFlipping = useCallback((gameId: string) => {
+  /**
+   * Advance a game through flipping → landing → result.
+   * Safe to call multiple times — triggeredRef blocks re-entry.
+   */
+  const triggerAnim = useCallback((gameId: string) => {
     if (triggeredRef.current.has(gameId)) return;
     triggeredRef.current.add(gameId);
-    setFlippingGames((prev) => new Set(prev).add(gameId));
+
+    setGamePhases((p) => new Map(p).set(gameId, "flipping"));
+
     setTimeout(() => {
-      setFlippingGames((prev) => {
-        const next = new Set(prev);
-        next.delete(gameId);
-        return next;
-      });
-    }, FLIP_WINDOW_MS);
+      // Flip done → show landing coin
+      setGamePhases((p) => new Map(p).set(gameId, "landing"));
+
+      setTimeout(() => {
+        // Landing done → show full result card
+        setGamePhases((p) => {
+          const next = new Map(p);
+          next.delete(gameId);
+          return next;
+        });
+      }, LANDING_MS);
+    }, FLIP_MS);
   }, []);
 
   /**
-   * For every poll: if a game's resolvedAt is within FLIP_WINDOW_MS,
-   * trigger the animation. This fires for the creator and any spectators
-   * the same way it fires for the joiner (via addFlipping in onSuccess).
+   * On every poll: check each finished game — if resolvedAt is recent enough,
+   * trigger the animation. This fires for ALL users (creator, spectators)
+   * without relying on state-diff detection.
    */
   useEffect(() => {
     const now = Date.now();
@@ -436,11 +441,11 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
       const game = msg.coinflipGame;
       if (!game?.resolvedAt) return;
       const elapsed = now - new Date(game.resolvedAt).getTime();
-      if (elapsed < FLIP_WINDOW_MS) {
-        addFlipping(game.id);
+      if (elapsed < ANIM_WINDOW_MS) {
+        triggerAnim(game.id);
       }
     });
-  }, [messages, addFlipping]);
+  }, [messages, triggerAnim]);
 
   const send = api.messages.send.useMutation({
     onSuccess: () => utils.messages.getRecent.invalidate(),
@@ -456,7 +461,8 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
 
   const joinGame = api.coinflip.join.useMutation({
     onSuccess: (game) => {
-      addFlipping(game.id);
+      // Joiner triggers immediately; others catch it via the poll effect above
+      triggerAnim(game.id);
       utils.messages.getRecent.invalidate();
       utils.users.me.invalidate();
     },
@@ -495,7 +501,7 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
         )}
         <button
           onClick={() => setView("users")}
-          className="relative flex items-center gap-1.5 rounded-md px-2 py-1 text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100"
+          className="flex items-center gap-1.5 rounded-md px-2 py-1 text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100"
         >
           <Users size={15} />
           <span className="text-xs font-medium">{onlineCount}</span>
@@ -518,9 +524,9 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
         ) : (
           <div className="flex flex-col gap-3">
             {messages.map((msg) => {
-              const isMe = msg.user.id === session?.user?.id;
+              const isMe      = msg.user.id === session?.user?.id;
               const isCoinflip = !!msg.coinflipGame;
-              const isNote = !!msg.sharedNoteTitle;
+              const isNote    = !!msg.sharedNoteTitle;
 
               if (isCoinflip) {
                 return (
@@ -531,8 +537,8 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
                     <CoinflipCard
                       game={msg.coinflipGame!}
                       currentUserId={session?.user?.id ?? ""}
-                      isFlipping={flippingGames.has(msg.coinflipGame!.id)}
-                      onJoin={(id) => joinGame.mutate({ gameId: id })}
+                      phase={gamePhases.get(msg.coinflipGame!.id)}
+                      onJoin={(id)   => joinGame.mutate({ gameId: id })}
                       onCancel={(id) => cancelGame.mutate({ gameId: id })}
                       joinPending={joinGame.isPending}
                       cancelPending={cancelGame.isPending}
@@ -550,24 +556,19 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
                     </div>
                   )}
                   <div className={`flex max-w-[80%] flex-col gap-0.5 ${isMe ? "items-end" : ""}`}>
-                    {!isMe && (
-                      <span className="text-xs font-medium text-zinc-500">{msg.user.name ?? "Unknown"}</span>
-                    )}
+                    {!isMe && <span className="text-xs font-medium text-zinc-500">{msg.user.name ?? "Unknown"}</span>}
+
                     {isNote ? (
                       <div className={`w-full overflow-hidden rounded-2xl border bg-zinc-800/60 ${isMe ? "rounded-tr-sm border-indigo-500/40" : "rounded-tl-sm border-zinc-700"}`}>
                         <div className={`flex items-center gap-1.5 border-b px-3 py-2 ${isMe ? "border-indigo-500/20 bg-indigo-500/10" : "border-zinc-700 bg-zinc-800"}`}>
                           <FileText size={11} className={isMe ? "text-indigo-300" : "text-zinc-400"} />
-                          <span className={`text-[10px] font-semibold uppercase tracking-wider ${isMe ? "text-indigo-300" : "text-zinc-400"}`}>
-                            Shared note
-                          </span>
+                          <span className={`text-[10px] font-semibold uppercase tracking-wider ${isMe ? "text-indigo-300" : "text-zinc-400"}`}>Shared note</span>
                         </div>
                         <div className="px-3 py-2.5">
                           <p className="mb-1 line-clamp-1 text-sm font-semibold text-zinc-100">{msg.sharedNoteTitle}</p>
-                          {msg.sharedNoteContent ? (
-                            <p className="line-clamp-3 text-xs leading-relaxed text-zinc-400">{msg.sharedNoteContent}</p>
-                          ) : (
-                            <p className="text-xs italic text-zinc-600">Empty note</p>
-                          )}
+                          {msg.sharedNoteContent
+                            ? <p className="line-clamp-3 text-xs leading-relaxed text-zinc-400">{msg.sharedNoteContent}</p>
+                            : <p className="text-xs italic text-zinc-600">Empty note</p>}
                         </div>
                       </div>
                     ) : (
@@ -585,49 +586,41 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
         )}
       </div>
 
-      {/* Bet selector — step 1: pick side */}
+      {/* Bet step 1: pick side */}
       {betStep === "side" && (
         <div className="border-t border-zinc-800 px-3 py-3">
           <p className="mb-2.5 text-xs font-semibold text-zinc-400">Pick your side</p>
           <div className="mb-3 flex gap-2">
-            {(["HEADS", "TAILS"] as CoinSide[]).map((side) => {
-              const s = SIDES[side];
-              const Icon = s.Icon;
-              const active = pickedSide === side;
-              return (
-                <button
-                  key={side}
-                  onClick={() => { setPickedSide(side); setBetStep("bet"); }}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-3 text-sm font-bold transition ${active ? s.activePillClass : s.pillClass}`}
-                >
-                  <CoinFaceStatic side={side} size={28} />
-                  {s.label}
-                </button>
-              );
-            })}
+            {(["HEADS", "TAILS"] as CoinSide[]).map((side) => (
+              <button
+                key={side}
+                onClick={() => { setPickedSide(side); setBetStep("bet"); }}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-3 text-sm font-bold transition ${SIDES[side].pillClass}`}
+              >
+                <CoinFace side={side} size={28} />
+                {SIDES[side].label}
+              </button>
+            ))}
           </div>
           <button onClick={() => setBetStep(null)} className="text-xs text-zinc-600 hover:text-zinc-400">Cancel</button>
         </div>
       )}
 
-      {/* Bet selector — step 2: pick amount */}
+      {/* Bet step 2: pick amount */}
       {betStep === "bet" && (
         <div className="border-t border-zinc-800 px-3 py-3">
           <div className="mb-2 flex items-center gap-2">
-            <button onClick={() => setBetStep("side")} className="text-zinc-600 hover:text-zinc-400">
-              <ArrowLeft size={14} />
-            </button>
+            <button onClick={() => setBetStep("side")} className="text-zinc-600 hover:text-zinc-400"><ArrowLeft size={14} /></button>
             <p className="text-xs font-semibold text-zinc-400">
-              Bet amount{" "}
+              Bet amount —{" "}
               <span className="inline-flex items-center gap-1">
-                — <CoinFaceStatic side={pickedSide} size={14} />
+                <CoinFace side={pickedSide} size={14} />
                 <span className={`font-bold ${SIDES[pickedSide].iconClass}`}>{SIDES[pickedSide].label}</span>
               </span>
             </p>
             {me && (
               <span className="ml-auto flex items-center gap-1 text-[10px] text-zinc-600">
-                <Coins size={9} className="text-amber-500/60" />
-                {me.points}
+                <Coins size={9} className="text-amber-500/60" />{me.points}
               </span>
             )}
           </div>
@@ -640,9 +633,7 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
                   disabled={!canAfford || createGame.isPending}
                   onClick={() => createGame.mutate({ bet: amount, creatorSide: pickedSide })}
                   className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                    canAfford
-                      ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:scale-95"
-                      : "cursor-not-allowed bg-zinc-800/40 text-zinc-700"
+                    canAfford ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:scale-95" : "cursor-not-allowed bg-zinc-800/40 text-zinc-700"
                   }`}
                 >
                   {createGame.isPending ? <Loader2 size={11} className="animate-spin" /> : <Coins size={11} />}
@@ -687,7 +678,7 @@ function ChatPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
-// ── Chat Bar (toggle + panel) ─────────────────────────────────────────────────
+// ── Chat Bar ──────────────────────────────────────────────────────────────────
 
 export default function ChatBar() {
   const [open, setOpen] = useState(false);
